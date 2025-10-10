@@ -38,6 +38,7 @@ class SunTimesService {
     longitude: number,
     date: Date,
     zenith: number,
+    isSunrise: boolean,
   ): Date | null {
     const julianDay = this.toJulian(date);
     const julianCentury = (julianDay - 2451545.0) / 36525.0;
@@ -91,25 +92,15 @@ class SunTimesService {
     const sunriseTime = solarNoon - (hourAngle * 4) / 1440;
     const sunsetTime = solarNoon + (hourAngle * 4) / 1440;
 
-    // For sunrise
-    if (zenith > 90) {
-      const hours = sunriseTime * 24;
-      const result = new Date(date);
-      result.setHours(Math.floor(hours));
-      result.setMinutes(Math.round((hours % 1) * 60));
-      result.setSeconds(0);
-      result.setMilliseconds(0);
-      return result;
-    } else {
-      // For sunset
-      const hours = sunsetTime * 24;
-      const result = new Date(date);
-      result.setHours(Math.floor(hours));
-      result.setMinutes(Math.round((hours % 1) * 60));
-      result.setSeconds(0);
-      result.setMilliseconds(0);
-      return result;
-    }
+    // Choose sunrise or sunset based on parameter
+    const timeValue = isSunrise ? sunriseTime : sunsetTime;
+    const hours = timeValue * 24;
+    const result = new Date(date);
+    result.setHours(Math.floor(hours));
+    result.setMinutes(Math.round((hours % 1) * 60));
+    result.setSeconds(0);
+    result.setMilliseconds(0);
+    return result;
   }
 
   /**
@@ -125,24 +116,28 @@ class SunTimesService {
       longitude,
       date,
       SUNRISE_SUNSET_ZENITH,
+      true, // sunrise
     );
     const sunset = this.calculateSunTimes(
       latitude,
       longitude,
       date,
       SUNRISE_SUNSET_ZENITH,
+      false, // sunset
     );
     const dawn = this.calculateSunTimes(
       latitude,
       longitude,
       date,
       CIVIL_TWILIGHT_ZENITH,
+      true, // dawn (sunrise for twilight)
     );
     const dusk = this.calculateSunTimes(
       latitude,
       longitude,
       date,
       CIVIL_TWILIGHT_ZENITH,
+      false, // dusk (sunset for twilight)
     );
 
     return {
