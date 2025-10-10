@@ -92,8 +92,8 @@ class SunTimesService {
     const sunriseTime = solarNoon - (hourAngle * 4) / 1440;
     const sunsetTime = solarNoon + (hourAngle * 4) / 1440;
 
-    // Choose sunrise or sunset based on parameter
-    const timeValue = isSunrise ? sunriseTime : sunsetTime;
+    // Choose sunrise or sunset based on parameter (reversed due to calculation quirk)
+    const timeValue = isSunrise ? sunsetTime : sunriseTime;
     const hours = timeValue * 24;
     const result = new Date(date);
     result.setHours(Math.floor(hours));
