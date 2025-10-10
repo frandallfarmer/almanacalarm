@@ -1,0 +1,98 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2E5C8A;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="sunGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD93D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="115" fill="url(#bgGradient)"/>
+  
+  <!-- Book/Almanac pages -->
+  <g filter="url(#shadow)">
+    <!-- Back page -->
+    <path d="M 160 140 L 380 140 L 380 400 Q 380 420 360 420 L 160 420 L 160 140 Z" 
+          fill="#F5F5F5" opacity="0.9"/>
+    
+    <!-- Front page with slight offset -->
+    <path d="M 150 130 L 370 130 L 370 390 Q 370 410 350 410 L 150 410 L 150 130 Z" 
+          fill="#FFFFFF"/>
+    
+    <!-- Book spine shadow -->
+    <rect x="150" y="130" width="8" height="280" fill="#000000" opacity="0.1"/>
+  </g>
+  
+  <!-- Calendar/Date elements on page -->
+  <text x="260" y="220" font-family="Arial, sans-serif" font-size="72" font-weight="bold" 
+        fill="#2E5C8A" text-anchor="middle">15</text>
+  <line x1="180" y1="240" x2="340" y2="240" stroke="#4A90E2" stroke-width="3"/>
+  
+  <!-- Month indicator lines -->
+  <line x1="180" y1="270" x2="280" y2="270" stroke="#AAA" stroke-width="2"/>
+  <line x1="180" y1="290" x2="320" y2="290" stroke="#AAA" stroke-width="2"/>
+  <line x1="180" y1="310" x2="260" y2="310" stroke="#AAA" stroke-width="2"/>
+  
+  <!-- Alarm clock on top -->
+  <g transform="translate(320, 180)">
+    <!-- Clock face -->
+    <circle cx="0" cy="0" r="35" fill="url(#sunGradient)" filter="url(#shadow)"/>
+    <circle cx="0" cy="0" r="32" fill="#FFFFFF"/>
+    
+    <!-- Clock center dot -->
+    <circle cx="0" cy="0" r="3" fill="#2E5C8A"/>
+    
+    <!-- Hour hand (pointing to 10) -->
+    <line x1="0" y1="0" x2="-8" y2="-15" stroke="#2E5C8A" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Minute hand (pointing to 2) -->
+    <line x1="0" y1="0" x2="12" y2="-18" stroke="#4A90E2" stroke-width="2" stroke-linecap="round"/>
+    
+    <!-- Clock tick marks -->
+    <line x1="0" y1="-28" x2="0" y2="-25" stroke="#2E5C8A" stroke-width="2"/>
+    <line x1="0" y1="28" x2="0" y2="25" stroke="#2E5C8A" stroke-width="2"/>
+    <line x1="-28" y1="0" x2="-25" y2="0" stroke="#2E5C8A" stroke-width="2"/>
+    <line x1="28" y1="0" x2="25" y2="0" stroke="#2E5C8A" stroke-width="2"/>
+    
+    <!-- Alarm bells on top -->
+    <circle cx="-35" cy="-40" r="12" fill="url(#sunGradient)"/>
+    <rect x="-40" y="-52" width="10" height="15" fill="#E67E22" rx="2"/>
+    
+    <circle cx="35" cy="-40" r="12" fill="url(#sunGradient)"/>
+    <rect x="30" y="-52" width="10" height="15" fill="#E67E22" rx="2"/>
+  </g>
+  
+  <!-- Sun/Moon indicator (showing day/night cycle) -->
+  <circle cx="200" cy="360" r="18" fill="url(#sunGradient)" opacity="0.8"/>
+  <path d="M 200 342 L 205 352 M 200 368 L 205 378 M 182 360 L 192 365 M 208 355 L 218 360" 
+        stroke="#FFA500" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  
+  <!-- Weather cloud -->
+  <g transform="translate(325, 350)">
+    <circle cx="0" cy="0" r="14" fill="#6B7280"/>
+    <circle cx="-12" cy="3" r="10" fill="#6B7280"/>
+    <circle cx="12" cy="3" r="10" fill="#6B7280"/>
+    <circle cx="-6" cy="-8" r="9" fill="#6B7280"/>
+    <circle cx="6" cy="-6" r="8" fill="#6B7280"/>
+  </g>
+  
+  <!-- Tide indicator -->
+  <g transform="translate(260, 355)">
+    <!-- Water waves -->
+    <path d="M -25 0 Q -20 -5, -15 0 Q -10 5, -5 0 Q 0 -5, 5 0 Q 10 5, 15 0 Q 20 -5, 25 0" 
+          stroke="#3B82F6" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M -25 8 Q -20 3, -15 8 Q -10 13, -5 8 Q 0 3, 5 8 Q 10 13, 15 8 Q 20 3, 25 8" 
+          stroke="#3B82F6" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+    <!-- Tide arrow (up for high tide) -->
+    <path d="M 32 5 L 32 -8 M 27 -3 L 32 -8 L 37 -3" 
+          stroke="#1E40AF" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
