@@ -52,7 +52,7 @@ echo ""
 cd "$ANDROID_DIR"
 
 echo -e "${BLUE}🧹 Cleaning previous builds...${NC}"
-./gradlew clean > /dev/null 2>&1
+./gradlew clean --quiet
 echo -e "${GREEN}✅ Clean completed${NC}"
 echo ""
 
