@@ -29,6 +29,7 @@ import SunTimesService, {SunTimes} from './services/SunTimesService';
 import GeocodingService, {CityInfo} from './services/GeocodingService';
 import TTSService from './services/TTSService';
 import AlarmService, {AlarmData} from './services/AlarmService';
+import BibleService, {BibleVerse} from './services/BibleService';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -44,6 +45,7 @@ function App(): React.JSX.Element {
   const [tides, setTides] = useState<TideEvent[]>([]);
   const [airQuality, setAirQuality] = useState<AirQualityData | null>(null);
   const [sunTimes, setSunTimes] = useState<SunTimes | null>(null);
+  const [bibleVerse, setBibleVerse] = useState<BibleVerse | null>(null);
 
   // Loading states
   const [dataLoading, setDataLoading] = useState<boolean>(false);
@@ -116,7 +118,7 @@ function App(): React.JSX.Element {
     setDataLoading(true);
 
     try {
-      const [cityData, weatherData, tidesData, airQualityData, sunTimesData] =
+      const [cityData, weatherData, tidesData, airQualityData, sunTimesData, verseData] =
         await Promise.allSettled([
           GeocodingService.getInstance().getCityFromCoordinates(
             location.latitude,
@@ -140,6 +142,7 @@ function App(): React.JSX.Element {
               location.longitude,
             ),
           ),
+          BibleService.getInstance().getVerseOfTheDay(),
         ]);
 
       if (cityData.status === 'fulfilled') {
@@ -156,6 +159,9 @@ function App(): React.JSX.Element {
       }
       if (sunTimesData.status === 'fulfilled') {
         setSunTimes(sunTimesData.value);
+      }
+      if (verseData.status === 'fulfilled') {
+        setBibleVerse(verseData.value);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -197,7 +203,11 @@ function App(): React.JSX.Element {
       }
 
       if (airQuality) {
-        speech += AirQualityService.getInstance().getAirQualitySpeechText(airQuality);
+        speech += AirQualityService.getInstance().getAirQualitySpeechText(airQuality) + ' ';
+      }
+
+      if (bibleVerse) {
+        speech += BibleService.getInstance().getVerseSpeechText(bibleVerse);
       }
 
       await TTSService.getInstance().speak(speech);
@@ -379,6 +389,22 @@ function App(): React.JSX.Element {
                       </Text>
                     </View>
                   ))}
+                </View>
+              )}
+
+              {/* Bible Verse of the Day */}
+              {bibleVerse && (
+                <View style={[styles.card, {backgroundColor: isDarkMode ? '#1a1a1a' : '#f5f5f5'}]}>
+                  <Text style={[styles.cardTitle, textStyle]}>Verse of the Day</Text>
+                  <Text style={[styles.verseReference, textStyle]}>
+                    {bibleVerse.reference}
+                  </Text>
+                  <Text style={[styles.verseText, textStyle]}>
+                    {bibleVerse.text}
+                  </Text>
+                  <Text style={[styles.verseTranslation, textStyle]}>
+                    — {bibleVerse.translation}
+                  </Text>
                 </View>
               )}
 
@@ -566,6 +592,25 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  verseReference: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+    textAlign: 'center',
+    opacity: 0.8,
+  },
+  verseText: {
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    marginBottom: 12,
+  },
+  verseTranslation: {
+    fontSize: 12,
+    textAlign: 'center',
+    opacity: 0.6,
   },
 });
 
