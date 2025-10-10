@@ -170,9 +170,24 @@ function App(): React.JSX.Element {
     }
   };
 
+  const getGreeting = (hour: number): string => {
+    if (hour >= 5 && hour < 12) {
+      return 'Good morning';
+    } else if (hour >= 12 && hour < 17) {
+      return 'Good afternoon';
+    } else if (hour >= 17 && hour < 21) {
+      return 'Good evening';
+    } else {
+      return 'Good night';
+    }
+  };
+
   const speakAlmanac = async () => {
     try {
       const now = new Date();
+      const hour = now.getHours();
+      const greeting = getGreeting(hour);
+
       const timeString = now.toLocaleTimeString('en-US', {
         hour: 'numeric',
         minute: '2-digit',
@@ -184,7 +199,7 @@ function App(): React.JSX.Element {
         day: 'numeric',
       });
 
-      let speech = `Good morning. It is ${timeString}, ${dateString}. `;
+      let speech = `${greeting}. It is ${timeString}, ${dateString}. `;
 
       if (cityInfo) {
         speech += `Your location is ${GeocodingService.getInstance().formatCityInfo(cityInfo)}. `;
