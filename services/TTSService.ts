@@ -26,30 +26,40 @@ class TTSService {
       return;
     }
 
+    // Try to initialize, but don't fail if individual steps fail
     try {
-      // Set default settings
       await Tts.setDefaultLanguage('en-US');
-      await Tts.setDefaultRate(0.5); // Slightly slower for clarity
+    } catch (error) {
+      console.warn('Could not set TTS language:', error);
+    }
+
+    try {
+      await Tts.setDefaultRate(0.5);
+    } catch (error) {
+      console.warn('Could not set TTS rate:', error);
+    }
+
+    try {
       await Tts.setDefaultPitch(1.0);
+    } catch (error) {
+      console.warn('Could not set TTS pitch:', error);
+    }
 
-      // Get available voices
+    try {
       const voices = await Tts.voices();
-      console.log('Available TTS voices:', voices);
-
-      // Try to use a high-quality voice if available
       const preferredVoices = voices.filter((v: any) =>
         v.language.startsWith('en-US'),
       );
-
       if (preferredVoices.length > 0) {
         await Tts.setDefaultVoice(preferredVoices[0].id);
       }
-
-      this.isInitialized = true;
     } catch (error) {
-      console.error('Error initializing TTS:', error);
-      throw error;
+      console.warn('Could not set TTS voice:', error);
     }
+
+    // Mark as initialized even if some steps failed
+    this.isInitialized = true;
+    console.log('TTS initialized (some features may be unavailable)');
   }
 
   /**

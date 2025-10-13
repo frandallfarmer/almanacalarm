@@ -152,6 +152,30 @@ function AlarmsScreen({navigation}: AlarmsScreenProps): React.JSX.Element {
     );
   };
 
+  const handleClearAll = async () => {
+    Alert.alert(
+      'Clear All Alarms',
+      'This will delete ALL scheduled alarms, including old ones. Continue?',
+      [
+        {text: 'Cancel', style: 'cancel'},
+        {
+          text: 'Clear All',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await AlarmService.getInstance().cancelAllAlarms();
+              await loadAlarms();
+              Alert.alert('Success', 'All alarms cleared');
+            } catch (error) {
+              console.error('Error clearing alarms:', error);
+              Alert.alert('Error', 'Failed to clear alarms');
+            }
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -167,6 +191,13 @@ function AlarmsScreen({navigation}: AlarmsScreenProps): React.JSX.Element {
             <Text style={[styles.backButtonText, textStyle]}>← Back</Text>
           </TouchableOpacity>
           <Text style={[styles.title, textStyle]}>Alarms</Text>
+          {alarms.length > 0 && (
+            <TouchableOpacity
+              style={styles.clearAllButton}
+              onPress={handleClearAll}>
+              <Text style={styles.clearAllButtonText}>Clear All</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Alarm List */}
@@ -359,6 +390,17 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     flex: 1,
+  },
+  clearAllButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#FF3B30',
+    borderRadius: 6,
+  },
+  clearAllButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   content: {
     flex: 1,

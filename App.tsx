@@ -69,6 +69,20 @@ function App(): React.JSX.Element {
 
       // Initialize AlarmService (critical)
       await AlarmService.getInstance().initialize();
+
+      // Check if we were launched by an alarm notification
+      const initialNotification = await notifee.getInitialNotification();
+      if (initialNotification) {
+        console.log('App launched by notification:', initialNotification);
+        // Handle alarm cleanup if it was an alarm
+        if (initialNotification.notification?.id) {
+          await handleAlarmFired(initialNotification.notification.id);
+        }
+      }
+
+      // Always speak almanac on launch
+      console.log('App launched - speaking almanac...');
+      await speakAlmanac();
     };
 
     initializeServices().catch(error => {
@@ -80,15 +94,19 @@ function App(): React.JSX.Element {
     const unsubscribeForeground = notifee.onForegroundEvent(async ({type, detail}) => {
       console.log('Foreground notification event:', type, detail);
 
-      if (type === EventType.DELIVERED || type === EventType.PRESS) {
-        console.log('Alarm triggered! Starting almanac speech...');
-        // Trigger the almanac speech
+      if (type === EventType.DELIVERED) {
+        console.log('Alarm DELIVERED! Starting almanac speech...');
+        // Automatically speak when alarm fires
         await speakAlmanac();
 
-        // Handle alarm after it fires
+        // Handle alarm cleanup (delete non-repeating)
         if (detail.notification?.id) {
           await handleAlarmFired(detail.notification.id);
         }
+      } else if (type === EventType.PRESS) {
+        console.log('User pressed notification - speaking again');
+        // User pressed the notification - speak again
+        await speakAlmanac();
       }
     });
 
@@ -96,15 +114,19 @@ function App(): React.JSX.Element {
     notifee.onBackgroundEvent(async ({type, detail}) => {
       console.log('Background notification event:', type, detail);
 
-      if (type === EventType.DELIVERED || type === EventType.PRESS) {
-        console.log('Alarm triggered in background! Starting almanac speech...');
-        // Trigger the almanac speech
+      if (type === EventType.DELIVERED) {
+        console.log('Alarm DELIVERED in background! Starting almanac speech...');
+        // Automatically speak when alarm fires
         await speakAlmanac();
 
-        // Handle alarm after it fires
+        // Handle alarm cleanup (delete non-repeating)
         if (detail.notification?.id) {
           await handleAlarmFired(detail.notification.id);
         }
+      } else if (type === EventType.PRESS) {
+        console.log('User pressed notification - speaking again');
+        // User pressed the notification - speak again
+        await speakAlmanac();
       }
     });
 

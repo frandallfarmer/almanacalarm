@@ -28,11 +28,15 @@ export const speakAlmanac = async (): Promise<void> => {
   try {
     console.log('Starting almanac speech...');
 
+    // Ensure TTS is initialized
+    const tts = TTSService.getInstance();
+    await tts.initialize();
+
     // Get location
     const locationResult = await LocationService.getInstance().getCurrentLocation();
     if ('code' in locationResult) {
       console.error('Location error:', locationResult);
-      await TTSService.getInstance().speak('Unable to get location. Please check your location permissions.');
+      await tts.speak('Unable to get location. Please check your location permissions.');
       return;
     }
 
@@ -92,10 +96,10 @@ export const speakAlmanac = async (): Promise<void> => {
     }
 
     console.log('Speaking almanac...');
-    await TTSService.getInstance().speak(speech);
+    await tts.speak(speech);
     console.log('Almanac speech completed');
   } catch (error) {
     console.error('Error in speakAlmanac:', error);
-    await TTSService.getInstance().speak('Sorry, there was an error reading your almanac information.');
+    alert(`Almanac error: ${error}`);
   }
 };
