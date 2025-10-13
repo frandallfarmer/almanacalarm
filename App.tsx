@@ -23,19 +23,58 @@ export type RootStackParamList = {
 
 const Stack = createStackNavigator<RootStackParamList>();
 
+/**
+ * Handle alarm after it fires - either delete non-repeating alarms or keep repeating ones
+ */
+async function handleAlarmFired(alarmId: string): Promise<void> {
+  try {
+    console.log('[handleAlarmFired] Handling alarm:', alarmId);
+    const alarmService = AlarmService.getInstance();
+    const allAlarms = await alarmService.getAllAlarms();
+    console.log('[handleAlarmFired] Current alarms in service:', allAlarms.length);
+    const alarm = allAlarms.find(a => a.id === alarmId);
+
+    if (!alarm) {
+      console.log('[handleAlarmFired] Alarm not found:', alarmId);
+      return;
+    }
+
+    console.log('[handleAlarmFired] Alarm details:', JSON.stringify(alarm));
+    console.log('[handleAlarmFired] Repeat enabled:', alarm.repeat);
+
+    if (!alarm.repeat) {
+      // Non-repeating alarm - delete it
+      console.log('[handleAlarmFired] Deleting non-repeating alarm:', alarmId);
+      await alarmService.deleteAlarm(alarmId);
+    } else {
+      // Repeating alarm - keep it in storage
+      // Notifee's RepeatFrequency.DAILY will automatically reschedule it
+      console.log('[handleAlarmFired] Keeping repeating alarm in storage:', alarmId);
+    }
+  } catch (error) {
+    console.error('[handleAlarmFired] Error handling fired alarm:', error);
+  }
+}
+
 function App(): React.JSX.Element {
   // Initialize services on app start
   useEffect(() => {
     const initializeServices = async () => {
+      // Initialize TTS (don't block on failure)
       try {
         await TTSService.getInstance().initialize();
-        await AlarmService.getInstance().initialize();
       } catch (error) {
-        console.error('Error initializing services:', error);
+        console.error('TTS initialization failed (non-fatal):', error);
       }
+
+      // Initialize AlarmService (critical)
+      await AlarmService.getInstance().initialize();
     };
 
-    initializeServices();
+    initializeServices().catch(error => {
+      console.error('FATAL: Error initializing services:', error);
+      alert(`Initialization Error: ${error}`);
+    });
 
     // Set up notification event handler for when alarm is triggered
     const unsubscribeForeground = notifee.onForegroundEvent(async ({type, detail}) => {
@@ -45,6 +84,11 @@ function App(): React.JSX.Element {
         console.log('Alarm triggered! Starting almanac speech...');
         // Trigger the almanac speech
         await speakAlmanac();
+
+        // Handle alarm after it fires
+        if (detail.notification?.id) {
+          await handleAlarmFired(detail.notification.id);
+        }
       }
     });
 
@@ -56,6 +100,11 @@ function App(): React.JSX.Element {
         console.log('Alarm triggered in background! Starting almanac speech...');
         // Trigger the almanac speech
         await speakAlmanac();
+
+        // Handle alarm after it fires
+        if (detail.notification?.id) {
+          await handleAlarmFired(detail.notification.id);
+        }
       }
     });
 

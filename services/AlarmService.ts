@@ -9,8 +9,8 @@ import notifee, {
   TimestampTrigger,
   RepeatFrequency,
 } from '@notifee/react-native';
+import { Platform, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
 
 export interface AlarmData {
   id: string;
@@ -40,6 +40,7 @@ class AlarmService {
    * Initialize notification channel (Android only) and load saved alarms
    */
   async initialize(): Promise<void> {
+    // Setup notifee (non-blocking - errors won't prevent alarm loading)
     try {
       if (Platform.OS === 'android') {
         await notifee.createChannel({
@@ -49,30 +50,33 @@ class AlarmService {
           sound: 'default',
           vibration: true,
         });
-        console.log('Notification channel created');
       }
 
-      // Request permissions
-      const settings = await notifee.requestPermission();
-      console.log('Notification permission status:', settings);
+      await notifee.requestPermission();
 
-      // Check for exact alarm permission on Android 12+
       if (Platform.OS === 'android') {
         const canScheduleExactAlarms = await notifee.canScheduleExactAlarms();
-        console.log('Can schedule exact alarms:', canScheduleExactAlarms);
-
         if (!canScheduleExactAlarms) {
-          console.warn('Exact alarm permission not granted');
-          // Request exact alarm permission
           await notifee.openAlarmPermissionSettings();
         }
       }
-
-      // Load saved alarms
-      await this.loadAlarms();
     } catch (error) {
-      console.error('Error initializing AlarmService:', error);
-      throw error;
+      console.error('Notifee setup error:', error);
+    }
+
+    // Load saved alarms (critical - must work)
+    await this.loadAlarms();
+
+    // Re-schedule all enabled alarms that were loaded from storage
+    const allAlarms = Array.from(this.alarms.values());
+    for (const alarm of allAlarms) {
+      if (alarm.enabled) {
+        try {
+          await this.scheduleAlarmWithoutSaving(alarm);
+        } catch (error) {
+          console.error(`Failed to reschedule alarm ${alarm.id}:`, error);
+        }
+      }
     }
   }
 
@@ -80,119 +84,124 @@ class AlarmService {
    * Save alarms to AsyncStorage
    */
   private async saveAlarms(): Promise<void> {
-    try {
-      const alarmsArray = Array.from(this.alarms.values()).map(alarm => ({
-        ...alarm,
-        time: alarm.time.toISOString(),
-      }));
-      await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(alarmsArray));
-    } catch (error) {
-      console.error('Error saving alarms:', error);
-    }
+    const alarmsArray = Array.from(this.alarms.values()).map(alarm => ({
+      ...alarm,
+      time: alarm.time.toISOString(),
+    }));
+    const json = JSON.stringify(alarmsArray);
+    await AsyncStorage.setItem(this.STORAGE_KEY, json);
   }
 
   /**
    * Load alarms from AsyncStorage
    */
   private async loadAlarms(): Promise<void> {
-    try {
-      const stored = await AsyncStorage.getItem(this.STORAGE_KEY);
-      if (stored) {
-        const alarmsArray = JSON.parse(stored);
-        this.alarms.clear();
-        for (const alarm of alarmsArray) {
-          this.alarms.set(alarm.id, {
-            ...alarm,
-            time: new Date(alarm.time),
-          });
-        }
+    const stored = await AsyncStorage.getItem(this.STORAGE_KEY);
+    if (stored) {
+      const alarmsArray = JSON.parse(stored);
+      this.alarms.clear();
+      for (const alarm of alarmsArray) {
+        this.alarms.set(alarm.id, {
+          ...alarm,
+          time: new Date(alarm.time),
+        });
       }
-    } catch (error) {
-      console.error('Error loading alarms:', error);
     }
+  }
+
+  /**
+   * Schedule an alarm with Notifee without saving to AsyncStorage
+   */
+  private async scheduleAlarmWithoutSaving(alarm: AlarmData): Promise<void> {
+    const now = new Date();
+    const alarmTime = new Date(alarm.time);
+
+    if (alarmTime <= now) {
+      alarmTime.setDate(alarmTime.getDate() + 1);
+    }
+
+    const trigger: TimestampTrigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: alarmTime.getTime(),
+    };
+
+    if (alarm.repeat) {
+      trigger.repeatFrequency = RepeatFrequency.DAILY;
+    }
+
+    await notifee.createTriggerNotification(
+      {
+        id: alarm.id,
+        title: 'Almanac Alarm',
+        body: alarm.label || 'Time to wake up!',
+        android: {
+          channelId: this.channelId,
+          importance: AndroidImportance.HIGH,
+          sound: 'default',
+          pressAction: {
+            id: 'default',
+          },
+        },
+        ios: {
+          sound: 'default',
+        },
+      },
+      trigger,
+    );
   }
 
   /**
    * Schedule an alarm
    */
   async scheduleAlarm(alarm: AlarmData): Promise<void> {
-    try {
-      // If time is in the past, adjust to tomorrow (or next occurrence for repeating)
-      const now = new Date();
-      const alarmTime = new Date(alarm.time);
+    const now = new Date();
+    const alarmTime = new Date(alarm.time);
 
-      if (alarmTime <= now) {
-        // Time is in the past - schedule for tomorrow at this time
-        alarmTime.setDate(alarmTime.getDate() + 1);
-        alarm.time = alarmTime;
-        console.log('Time was in past, adjusted to tomorrow');
-      }
+    if (alarmTime <= now) {
+      alarmTime.setDate(alarmTime.getDate() + 1);
+      alarm.time = alarmTime;
+    }
 
-      console.log('Scheduling alarm for:', alarm.time.toLocaleString());
-      console.log('Current time:', now.toLocaleString());
-      console.log('Repeat:', alarm.repeat);
+    const trigger: TimestampTrigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: alarmTime.getTime(),
+    };
 
-      const trigger: TimestampTrigger = {
-        type: TriggerType.TIMESTAMP,
-        timestamp: alarmTime.getTime(),
-      };
+    if (alarm.repeat) {
+      trigger.repeatFrequency = RepeatFrequency.DAILY;
+    }
 
-      if (alarm.repeat) {
-        // For repeating alarms, schedule daily
-        trigger.repeatFrequency = RepeatFrequency.DAILY;
-        console.log('Alarm set to repeat daily');
-      }
-
-      console.log('Creating trigger notification with:', {
+    await notifee.createTriggerNotification(
+      {
         id: alarm.id,
-        timestamp: trigger.timestamp,
         title: 'Almanac Alarm',
         body: alarm.label || 'Time to wake up!',
-      });
-
-      await notifee.createTriggerNotification(
-        {
-          id: alarm.id,
-          title: 'Almanac Alarm',
-          body: alarm.label || 'Time to wake up!',
-          android: {
-            channelId: this.channelId,
-            importance: AndroidImportance.HIGH,
-            sound: 'default',
-            pressAction: {
-              id: 'default',
-            },
-          },
-          ios: {
-            sound: 'default',
+        android: {
+          channelId: this.channelId,
+          importance: AndroidImportance.HIGH,
+          sound: 'default',
+          pressAction: {
+            id: 'default',
           },
         },
-        trigger,
-      );
+        ios: {
+          sound: 'default',
+        },
+      },
+      trigger,
+    );
 
-      this.alarms.set(alarm.id, alarm);
-      await this.saveAlarms();
-      console.log('Alarm scheduled successfully:', alarm);
-    } catch (error) {
-      console.error('Error scheduling alarm:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      throw new Error(`Failed to schedule alarm: ${errorMessage}`);
-    }
+    this.alarms.set(alarm.id, alarm);
+    await this.saveAlarms();
   }
 
   /**
-   * Cancel an alarm
+   * Cancel an alarm - removes from Notifee and from storage
    */
   async cancelAlarm(alarmId: string): Promise<void> {
-    try {
-      await notifee.cancelNotification(alarmId);
-      this.alarms.delete(alarmId);
-      await this.saveAlarms();
-      console.log('Alarm cancelled:', alarmId);
-    } catch (error) {
-      console.error('Error cancelling alarm:', error);
-      throw error;
-    }
+    await notifee.cancelNotification(alarmId);
+    this.alarms.delete(alarmId);
+    await this.saveAlarms();
   }
 
   /**
@@ -221,12 +230,10 @@ class AlarmService {
   }
 
   /**
-   * Delete an alarm
+   * Delete an alarm (same as cancelAlarm - removes from Notifee and storage)
    */
   async deleteAlarm(alarmId: string): Promise<void> {
     await this.cancelAlarm(alarmId);
-    this.alarms.delete(alarmId);
-    await this.saveAlarms();
   }
 
   /**
