@@ -69,7 +69,7 @@ export const speakAlmanac = async (): Promise<void> => {
       day: 'numeric',
     });
 
-    let speech = `Hello. ${greeting}. It is ${timeString}, ${dateString}. `;
+    let speech = `${greeting}. It is ${timeString}, ${dateString}. `;
 
     if (cityInfo.status === 'fulfilled' && cityInfo.value) {
       speech += `Your location is ${GeocodingService.getInstance().formatCityInfo(cityInfo.value)}. `;

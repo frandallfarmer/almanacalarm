@@ -14,6 +14,7 @@ import HomeScreen from './screens/HomeScreen';
 import AlarmsScreen from './screens/AlarmsScreen';
 import TTSService from './services/TTSService';
 import AlarmService from './services/AlarmService';
+import BatteryOptimizationService from './services/BatteryOptimizationService';
 import {speakAlmanac} from './utils/AlmanacSpeaker';
 
 export type RootStackParamList = {
@@ -60,6 +61,13 @@ function App(): React.JSX.Element {
   // Initialize services on app start
   useEffect(() => {
     const initializeServices = async () => {
+      // Request battery optimization exemption for network access during Doze mode
+      try {
+        await BatteryOptimizationService.getInstance().requestBatteryOptimizationExemption();
+      } catch (error) {
+        console.error('Battery optimization request failed (non-fatal):', error);
+      }
+
       // Initialize TTS (don't block on failure)
       try {
         await TTSService.getInstance().initialize();

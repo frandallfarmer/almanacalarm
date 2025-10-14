@@ -76,6 +76,38 @@ class LocationService {
   }
 
   /**
+   * Request background location permission (Android 10+)
+   */
+  private async requestBackgroundLocationPermission(): Promise<boolean> {
+    if (Platform.OS === 'ios') {
+      return true;
+    }
+
+    // Only needed on Android 10+ (API 29+)
+    if (Platform.Version < 29) {
+      return true;
+    }
+
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION as any,
+        {
+          title: 'Background Location Permission',
+          message: 'Almanac Alarm needs background location access to get weather, tide, and air quality data when alarms fire.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.warn('[LocationService] Background location permission error:', err);
+      return false;
+    }
+  }
+
+  /**
    * Get current location
    */
   async getCurrentLocation(): Promise<LocationData | LocationError> {
@@ -85,6 +117,11 @@ class LocationService {
     // If not, try to request it (only works when app is in foreground)
     if (!hasPermission) {
       hasPermission = await this.requestLocationPermission();
+
+      // Also request background location on Android 10+
+      if (hasPermission) {
+        await this.requestBackgroundLocationPermission();
+      }
     }
 
     if (!hasPermission) {
@@ -111,9 +148,9 @@ class LocationService {
           });
         },
         {
-          enableHighAccuracy: true,
-          timeout: 15000,
-          maximumAge: 10000,
+          enableHighAccuracy: false, // Use network location for faster results in background
+          timeout: 30000, // 30 seconds - more time for location when phone is asleep
+          maximumAge: 300000, // Accept cached location up to 5 minutes old
         },
       );
     });

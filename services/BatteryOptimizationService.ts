@@ -1,9 +1,11 @@
 /**
  * Battery Optimization Service
- * Requests exemption from battery optimization to ensure alarms work reliably
+ * Requests exemption from battery optimization to ensure network access during Doze mode
  */
 
-import {NativeModules, Platform, Linking} from 'react-native';
+import {NativeModules, Platform} from 'react-native';
+
+const {PowerManagerHelper} = NativeModules;
 
 class BatteryOptimizationService {
   private static instance: BatteryOptimizationService;
@@ -19,32 +21,55 @@ class BatteryOptimizationService {
 
   /**
    * Check if battery optimization is disabled for this app
-   * Note: This requires native module implementation
    */
   async isBatteryOptimizationDisabled(): Promise<boolean> {
     if (Platform.OS !== 'android') {
       return true;
     }
 
-    // For now, assume we need to request it
-    return false;
+    try {
+      if (PowerManagerHelper && PowerManagerHelper.isIgnoringBatteryOptimizations) {
+        const isIgnoring = await PowerManagerHelper.isIgnoringBatteryOptimizations();
+        console.log('[BatteryOptimization] Is ignoring battery optimizations:', isIgnoring);
+        return isIgnoring;
+      }
+      console.warn('[BatteryOptimization] PowerManagerHelper not available');
+      return false;
+    } catch (error) {
+      console.error('[BatteryOptimization] Error checking battery optimization:', error);
+      return false;
+    }
   }
 
   /**
    * Request to disable battery optimization
-   * Opens system settings for user to manually disable
+   * This allows network access and location during Doze mode
+   * Returns true if permission was granted or already granted
    */
-  async requestBatteryOptimizationExemption(): Promise<void> {
+  async requestBatteryOptimizationExemption(): Promise<boolean> {
     if (Platform.OS !== 'android') {
-      return;
+      return true;
     }
 
     try {
-      // Open battery optimization settings
-      await Linking.openSettings();
-      console.log('[BatteryOptimization] Opened settings for battery optimization');
+      const isAlreadyDisabled = await this.isBatteryOptimizationDisabled();
+      if (isAlreadyDisabled) {
+        console.log('[BatteryOptimization] Battery optimization already disabled');
+        return true;
+      }
+
+      console.log('[BatteryOptimization] Requesting battery optimization exemption...');
+      if (PowerManagerHelper && PowerManagerHelper.requestIgnoreBatteryOptimizations) {
+        await PowerManagerHelper.requestIgnoreBatteryOptimizations();
+        console.log('[BatteryOptimization] Request dialog shown');
+        return true;
+      } else {
+        console.warn('[BatteryOptimization] PowerManagerHelper not available');
+        return false;
+      }
     } catch (error) {
-      console.error('[BatteryOptimization] Failed to open settings:', error);
+      console.error('[BatteryOptimization] Failed to request battery optimization exemption:', error);
+      return false;
     }
   }
 }
