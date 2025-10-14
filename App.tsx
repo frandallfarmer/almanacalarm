@@ -88,7 +88,7 @@ function App(): React.JSX.Element {
       alert(`Initialization Error: ${error}`);
     });
 
-    // Set up foreground event handler
+    // Set up foreground event handler (background handler is in index.js)
     const unsubscribeForeground = notifee.onForegroundEvent(async ({type, detail}) => {
       console.log('[App.tsx] Foreground notification event:', type, detail);
 
@@ -102,26 +102,6 @@ function App(): React.JSX.Element {
         }
       } else if (type === EventType.PRESS) {
         console.log('[App.tsx] User pressed notification - speaking almanac');
-        // User pressed the notification - speak it
-        await speakAlmanac();
-      }
-    });
-
-    // Set up background event handler
-    notifee.onBackgroundEvent(async ({type, detail}) => {
-      console.log('[App.tsx] Background notification event:', type, detail);
-
-      if (type === EventType.DELIVERED) {
-        console.log('[App.tsx] Alarm DELIVERED in background! Starting almanac speech...');
-        // Automatically speak when alarm fires
-        await speakAlmanac();
-
-        // Handle alarm cleanup (delete non-repeating)
-        if (detail.notification?.id) {
-          await handleAlarmFired(detail.notification.id);
-        }
-      } else if (type === EventType.PRESS) {
-        console.log('[App.tsx] User pressed notification in background');
         // User pressed the notification - speak it
         await speakAlmanac();
       }

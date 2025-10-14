@@ -69,7 +69,7 @@ export const speakAlmanac = async (): Promise<void> => {
       day: 'numeric',
     });
 
-    let speech = `${greeting}. It is ${timeString}, ${dateString}. `;
+    let speech = `Hello. ${greeting}. It is ${timeString}, ${dateString}. `;
 
     if (cityInfo.status === 'fulfilled' && cityInfo.value) {
       speech += `Your location is ${GeocodingService.getInstance().formatCityInfo(cityInfo.value)}. `;
@@ -100,6 +100,8 @@ export const speakAlmanac = async (): Promise<void> => {
     console.log('Almanac speech completed');
   } catch (error) {
     console.error('Error in speakAlmanac:', error);
-    alert(`Almanac error: ${error}`);
+    // Speak the error instead of using alert (which doesn't work in background)
+    const tts = TTSService.getInstance();
+    await tts.speak('Error in speak almanac: ' + (error as Error).message);
   }
 };
