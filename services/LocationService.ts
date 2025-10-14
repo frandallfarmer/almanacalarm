@@ -20,6 +20,8 @@ export interface LocationError {
 
 class LocationService {
   private static instance: LocationService;
+  private cachedLocation: LocationData | null = null;
+  private readonly CACHE_MAX_AGE_MS = 3600000; // 1 hour
 
   private constructor() {}
 
@@ -28,6 +30,32 @@ class LocationService {
       LocationService.instance = new LocationService();
     }
     return LocationService.instance;
+  }
+
+  /**
+   * Get cached location if available and not too old
+   */
+  private getCachedLocation(): LocationData | null {
+    if (!this.cachedLocation) {
+      return null;
+    }
+
+    const age = Date.now() - this.cachedLocation.timestamp;
+    if (age > this.CACHE_MAX_AGE_MS) {
+      console.log('[LocationService] Cached location expired');
+      return null;
+    }
+
+    console.log('[LocationService] Using cached location');
+    return this.cachedLocation;
+  }
+
+  /**
+   * Save location to cache
+   */
+  private cacheLocation(location: LocationData): void {
+    this.cachedLocation = location;
+    console.log('[LocationService] Location cached');
   }
 
   /**
@@ -60,40 +88,68 @@ class LocationService {
 
   /**
    * Get current location
+   * Falls back to cached location if fresh location unavailable (e.g., in Doze mode)
    */
   async getCurrentLocation(): Promise<LocationData | LocationError> {
-    const hasPermission = await this.requestLocationPermission();
+    try {
+      const hasPermission = await this.requestLocationPermission();
 
-    if (!hasPermission) {
+      if (!hasPermission) {
+        // Try cached location if permission denied but we have cache
+        const cached = this.getCachedLocation();
+        if (cached) {
+          console.log('[LocationService] Permission denied, using cached location');
+          return cached;
+        }
+        return {
+          code: 1,
+          message: 'Location permission denied',
+        };
+      }
+
+      // Try to get fresh location
+      const location = await new Promise<LocationData>((resolve, reject) => {
+        Geolocation.getCurrentPosition(
+          position => {
+            resolve({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              accuracy: position.coords.accuracy,
+              timestamp: position.timestamp,
+            });
+          },
+          error => {
+            reject({
+              code: error.code,
+              message: error.message,
+            });
+          },
+          {
+            enableHighAccuracy: false, // Use false for better battery in background
+            timeout: 10000, // Shorter timeout for background
+            maximumAge: 300000, // Accept 5-minute-old location
+          },
+        );
+      });
+
+      // Cache the fresh location
+      this.cacheLocation(location);
+      return location;
+    } catch (error: any) {
+      // If fresh location fails, try cached location
+      const cached = this.getCachedLocation();
+      if (cached) {
+        console.log('[LocationService] Fresh location failed, using cached location');
+        return cached;
+      }
+
+      // No cache available, return error
+      console.error('[LocationService] Location failed and no cache available:', error);
       return {
-        code: 1,
-        message: 'Location permission denied',
+        code: error.code || 999,
+        message: error.message || 'Unable to get location',
       };
     }
-
-    return new Promise((resolve, reject) => {
-      Geolocation.getCurrentPosition(
-        position => {
-          resolve({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-            timestamp: position.timestamp,
-          });
-        },
-        error => {
-          reject({
-            code: error.code,
-            message: error.message,
-          });
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 15000,
-          maximumAge: 10000,
-        },
-      );
-    });
   }
 
   /**
