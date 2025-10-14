@@ -12,21 +12,20 @@ A bespoke alarm clock for Android that speaks your morning briefing in a human v
 
 ## Features
 
-### Implemented Features
-
 - **Voice Announcements**: Uses text-to-speech to speak all almanac information
+- **Background Alarms**: Alarms fire and speak almanac without launching the app UI
 - **Dynamic Greetings**: Time-appropriate greetings (Good morning/afternoon/evening/night)
 - **Location-Based**: Automatically gets your location and nearest city
+- **Background Location**: Full support for location access when app is closed or phone is sleeping
 - **Weather Data**: Real-time weather from Open-Meteo API (free, no API key required)
 - **Tide Information**: Tide predictions from NOAA for coastal areas
 - **Air Quality**: Current air quality index and particulate levels from Open-Meteo
 - **Sun Times**: Calculates sunrise and sunset times using astronomical algorithms
 - **Daily Bible Verse**: 31 curated verses rotating daily (KJV)
 - **Dark/Light Mode**: Adaptive UI theme support
-
-### In Development
-
-> **Note**: The alarm scheduling feature is not yet fully functional. Currently, the app provides a manual "Speak Almanac" button to trigger announcements. Automatic alarm triggering is planned for a future release.
+- **Repeating Alarms**: Support for one-time and daily repeating alarms
+- **Battery Optimization**: Automatic request for battery exemption to ensure network access during sleep
+- **Auto-Dismiss**: Notifications automatically dismiss after almanac completes
 
 ## Technology Stack
 
@@ -145,7 +144,7 @@ almanacalarm/
 
 All services follow the singleton pattern and are initialized on app start:
 
-- **LocationService**: Requests permissions and gets current GPS coordinates
+- **LocationService**: Requests permissions (including background location) and gets current GPS coordinates
 - **WeatherService**: Fetches current weather conditions from Open-Meteo API
 - **TideService**: Finds nearest NOAA tide station and gets 24-hour predictions
 - **AirQualityService**: Gets current air quality index and particulate levels
@@ -153,7 +152,8 @@ All services follow the singleton pattern and are initialized on app start:
 - **GeocodingService**: Reverse geocodes coordinates to city names via OpenStreetMap Nominatim
 - **BibleService**: Fetches daily Bible verses from bible-api.com with 31-verse rotation
 - **TTSService**: Manages text-to-speech engine configuration and playback
-- **AlarmService**: Schedules and manages alarms (in development)
+- **AlarmService**: Schedules and manages alarms using Notifee
+- **BatteryOptimizationService**: Requests battery optimization exemption for reliable background operation
 
 ### Time-Based Greetings
 
@@ -174,52 +174,68 @@ The daily Bible verse feature includes 31 carefully curated verses that rotate b
 
 ## Usage
 
-### Current Functionality
+### Setting Up Alarms
 
-Once installed, the app provides:
+Once installed:
 
-1. **Manual Trigger**: Tap the "Speak Almanac" button to hear the complete briefing
-2. **Information Display**: View all data on the main screen
-3. **Dark/Light Mode**: The interface adapts to your system theme
+1. **First Launch**: Grant location permissions when prompted, and allow battery optimization exemption for reliable background operation
+2. **Manage Alarms**: Tap "Manage Alarms" on the home screen
+3. **Create Alarm**: Set time, label, and choose one-time or repeating
+4. **Background Operation**: Alarms will fire and speak the almanac even when your phone is asleep, without launching the app
+
+### Manual Trigger
+
+You can also manually trigger the almanac announcement:
+1. Tap the "Speak Almanac" button on the home screen
+2. The app will fetch all current data and speak it aloud
 
 **Sample Announcement:**
 
-> "Good morning. It is 8:30 AM, Friday, October 10th, 2025. You are in Portland. The temperature is 62 degrees Fahrenheit with partly cloudy skies. Humidity is 75%. Wind speed is 8 miles per hour. Sunrise at 7:12 AM, sunset at 6:45 PM. Current tide is 4.3 feet. Next high tide at 2:15 PM, 7.8 feet. Air quality is good with an index of 42. Today's verse: For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life. John 3:16."
+> "Good morning. It is 8:30 AM, Friday, October 10th, 2025. Your location is Portland, Oregon. The temperature is 62 degrees Fahrenheit with partly cloudy skies. Humidity is 75%. Wind speed is 8 miles per hour. Sunrise at 7:12 AM, sunset at 6:45 PM. Current tide is 4.3 feet. Next high tide at 2:15 PM, 7.8 feet. Air quality is good with an index of 42. Today's verse: For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life. John 3:16."
 
 ### Permissions
 
 The app requires the following Android permissions:
 
 - `ACCESS_FINE_LOCATION` - For getting your location
-- `SCHEDULE_EXACT_ALARM` - For setting precise alarm times (future use)
-- `POST_NOTIFICATIONS` - For alarm notifications (future use)
+- `ACCESS_BACKGROUND_LOCATION` - For location access when app is closed (Android 10+)
+- `SCHEDULE_EXACT_ALARM` - For setting precise alarm times
+- `POST_NOTIFICATIONS` - For alarm notifications
+- `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` - For reliable background operation and network access during sleep
 - `INTERNET` - For fetching weather, tide, air quality, and Bible verse data
+- `DISABLE_KEYGUARD` - For alarms to work when phone is locked
 
 ## Future Enhancements
 
 > **Note**: Custom voice recording is a planned feature. Currently, the app uses standard text-to-speech synthesis. Future versions will allow users to record their own voice for personalized announcements.
 
-- [ ] **Alarm Triggering**: Automatic alarm scheduling and wake-up functionality
 - [ ] **Custom Voice Recording**: Record and use your own voice instead of TTS
 - [ ] **Configurable Content**: Choose which data to announce
-- [ ] **Multiple Alarms**: Different schedules with unique content
 - [ ] **Snooze Functionality**: Configurable snooze options
 - [ ] **Historical Data**: Track weather, tides, and air quality over time
 - [ ] **Widget Support**: Home screen widgets for quick info
 - [ ] **iOS Support**: iPhone and iPad compatibility
+- [ ] **Custom Alarm Sounds**: Option to play a sound before/after the almanac announcement
 
 ## Known Issues
 
-- **Alarm Scheduling**: Automatic alarm triggering not yet implemented
-- **Deprecation Warnings**: Some React Native native modules use deprecated APIs (onCatalystInstanceDestroy)
+- **Deprecation Warnings**: Some React Native native modules use deprecated APIs (onCatalystInstanceDestroy) - these are non-breaking warnings
 - **iOS Support**: Not yet available for iOS devices
 
 ## Version History
 
-### v0.0.1 (2025-10-10) - Initial Release
+### v1.0.0 (2025-10-14) - First Stable Release
 
-**Implemented Features:**
-- Core voice announcement system with TTS
+**Major Features:**
+- ✅ **Fully functional background alarm system** - Alarms fire and speak almanac without launching app
+- ✅ **Background location support** - Automatic request for background location permission (Android 10+)
+- ✅ **Battery optimization exemption** - Native module to request unrestricted background access for network and location during Doze mode
+- ✅ **Auto-dismiss notifications** - Notifications automatically clear after almanac completes
+- ✅ **Repeating alarms** - Support for one-time and daily repeating alarms
+- ✅ **Voice error reporting** - Errors spoken aloud via TTS for debugging background issues
+
+**Core Features:**
+- Voice announcement system with TTS
 - Dynamic time-based greetings (morning/afternoon/evening/night)
 - Location service with GPS and reverse geocoding
 - Weather data integration (Open-Meteo API)
@@ -231,15 +247,32 @@ The app requires the following Android permissions:
 - Automated build and deployment script
 - Dark/light mode UI support
 
+**Technical Improvements:**
+- Background event handler registered at root level (index.js) for proper closed-app handling
+- Dynamic service initialization in background context
+- Custom native Kotlin module for PowerManager integration
+- Comprehensive error handling with audible feedback
+
 **Bug Fixes:**
-- Fixed sunrise/sunset calculation returning identical times
-- Fixed reversed sunrise/sunset values
-- Fixed hard-coded "Good morning" greeting
+- Fixed background alarm handler not being called when app is closed
+- Fixed location timeout issues in background with proper permission flow
+- Fixed network access during Android Doze mode
+- Fixed silent failures with proper TTS error reporting
+
+### v0.0.1 (2025-10-10) - Initial Development Release
+
+**Implemented Features:**
+- Core voice announcement system with TTS
+- Dynamic time-based greetings
+- Location service with GPS and reverse geocoding
+- Weather, tide, air quality, and Bible verse integration
+- Automated build script
+- Dark/light mode UI
 
 **Known Limitations:**
-- Manual trigger only (no automatic alarms yet)
+- Manual trigger only (no automatic alarms)
 - Android only
-- Standard TTS voice (custom voice recording not implemented)
+- Standard TTS voice
 
 ## Contributing
 
