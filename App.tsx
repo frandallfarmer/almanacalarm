@@ -80,9 +80,7 @@ function App(): React.JSX.Element {
         }
       }
 
-      // Always speak almanac on launch
-      console.log('App launched - speaking almanac...');
-      await speakAlmanac();
+      // Don't auto-speak on launch - only speak when alarm fires in background
     };
 
     initializeServices().catch(error => {
@@ -95,17 +93,14 @@ function App(): React.JSX.Element {
       console.log('Foreground notification event:', type, detail);
 
       if (type === EventType.DELIVERED) {
-        console.log('Alarm DELIVERED! Starting almanac speech...');
-        // Automatically speak when alarm fires
-        await speakAlmanac();
-
+        console.log('Alarm DELIVERED in foreground');
         // Handle alarm cleanup (delete non-repeating)
         if (detail.notification?.id) {
           await handleAlarmFired(detail.notification.id);
         }
       } else if (type === EventType.PRESS) {
-        console.log('User pressed notification - speaking again');
-        // User pressed the notification - speak again
+        console.log('User pressed notification - speaking almanac');
+        // User pressed the notification - speak it
         await speakAlmanac();
       }
     });

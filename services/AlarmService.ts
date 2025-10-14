@@ -121,13 +121,9 @@ class AlarmService {
           sound: 'default',
           autoCancel: false,
           ongoing: true,
+          // Don't launch app - just fire the notification and speak in background
           pressAction: {
             id: 'default',
-            launchActivity: 'default',
-          },
-          fullScreenAction: {
-            id: 'default',
-            launchActivity: 'default',
           },
         },
         ios: {
