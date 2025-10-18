@@ -14,6 +14,7 @@ import HomeScreen from './screens/HomeScreen';
 import AlarmsScreen from './screens/AlarmsScreen';
 import TTSService from './services/TTSService';
 import AlarmService from './services/AlarmService';
+import LocationService from './services/LocationService';
 import BatteryOptimizationService from './services/BatteryOptimizationService';
 import {speakAlmanac} from './utils/AlmanacSpeaker';
 
@@ -61,18 +62,33 @@ function App(): React.JSX.Element {
   // Initialize services on app start
   useEffect(() => {
     const initializeServices = async () => {
-      // Request battery optimization exemption for network access during Doze mode
+      // Initialize TTS first (don't block on failure)
+      try {
+        await TTSService.getInstance().initialize();
+      } catch (error) {
+        console.error('TTS initialization failed (non-fatal):', error);
+      }
+
+      // Request battery optimization exemption first for network access during Doze mode
       try {
         await BatteryOptimizationService.getInstance().requestBatteryOptimizationExemption();
       } catch (error) {
         console.error('Battery optimization request failed (non-fatal):', error);
       }
 
-      // Initialize TTS (don't block on failure)
+      // Request all location permissions
       try {
-        await TTSService.getInstance().initialize();
+        const locationService = LocationService.getInstance();
+
+        // Request fine location first
+        const hasLocation = await locationService.requestLocationPermission();
+
+        if (hasLocation) {
+          // Then request background location (Android 10+ will show "Allow all the time" option)
+          await locationService.requestBackgroundLocationPermission();
+        }
       } catch (error) {
-        console.error('TTS initialization failed (non-fatal):', error);
+        console.error('Location permission request failed (non-fatal):', error);
       }
 
       // Initialize AlarmService (critical)

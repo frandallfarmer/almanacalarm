@@ -41,8 +41,6 @@ Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
-Note: Some input files use or override a deprecated API.
-Note: Recompile with -Xlint:deprecation for details.
 /home/randy/almanacalarm/node_modules/react-native-tts/android/src/main/java/net/no_mad/tts/TextToSpeechModule.java:441: warning: [removal] onCatalystInstanceDestroy() in NativeModule has been deprecated and marked for removal
     public void onCatalystInstanceDestroy() {
                 ^
@@ -54,6 +52,8 @@ Note: Recompile with -Xlint:deprecation for details.
 Note: /home/randy/almanacalarm/node_modules/react-native-tts/android/src/main/java/net/no_mad/tts/TextToSpeechModule.java uses unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
 2 warnings
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
 [0;32m✅ Debug build completed[0m
 
 [0;34m🚀 Building Release APK...[0m
@@ -72,10 +72,10 @@ Note: Recompile with -Xlint:deprecation for details.
 1 warning
 Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
-Note: Some input files use or override a deprecated API.
-Note: Recompile with -Xlint:deprecation for details.
 Note: /home/randy/almanacalarm/node_modules/@react-native-async-storage/async-storage/android/src/javaPackage/java/com/reactnativecommunity/asyncstorage/AsyncStoragePackage.java uses unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
 Note: /home/randy/almanacalarm/node_modules/react-native-background-actions/android/src/main/java/com/asterinet/react/bgactions/BackgroundActionsPackage.java uses or overrides a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 Note: Some input files use or override a deprecated API.
@@ -127,14 +127,14 @@ Done copying assets
 [0;34m📊 Build Summary[0m
 ----------------------------------------
 [0;33mDebug APK:[0m
-  File: AlmanacAlarm_debug_20251014_145425.apk
+  File: AlmanacAlarm_debug_20251018_093817.apk
   Size: 119M
-  Location: /home/randy/Dropbox/AlmanacAlarm_debug_20251014_145425.apk
+  Location: /home/randy/Dropbox/AlmanacAlarm_debug_20251018_093817.apk
 
 [0;33mRelease APK (Recommended):[0m
-  File: AlmanacAlarm_release_20251014_145425.apk
+  File: AlmanacAlarm_release_20251018_093817.apk
   Size: 56M
-  Location: /home/randy/Dropbox/AlmanacAlarm_release_20251014_145425.apk
+  Location: /home/randy/Dropbox/AlmanacAlarm_release_20251018_093817.apk
 
 [0;32m🎉 Build and deployment completed successfully![0m
 

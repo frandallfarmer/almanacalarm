@@ -51,7 +51,7 @@ class LocationService {
   /**
    * Request location permissions on Android
    */
-  private async requestLocationPermission(): Promise<boolean> {
+  async requestLocationPermission(): Promise<boolean> {
     if (Platform.OS === 'ios') {
       return true;
     }
@@ -78,7 +78,7 @@ class LocationService {
   /**
    * Request background location permission (Android 10+)
    */
-  private async requestBackgroundLocationPermission(): Promise<boolean> {
+  async requestBackgroundLocationPermission(): Promise<boolean> {
     if (Platform.OS === 'ios') {
       return true;
     }
