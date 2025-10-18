@@ -28,6 +28,7 @@ import SunTimesService, {SunTimes} from '../services/SunTimesService';
 import GeocodingService, {CityInfo} from '../services/GeocodingService';
 import TTSService from '../services/TTSService';
 import BibleService, {BibleVerse} from '../services/BibleService';
+import BirdingService, {NotableBird} from '../services/BirdingService';
 
 type RootStackParamList = {
   Home: undefined;
@@ -52,6 +53,7 @@ function HomeScreen({navigation}: HomeScreenProps): React.JSX.Element {
   const [tides, setTides] = useState<TideEvent[]>([]);
   const [airQuality, setAirQuality] = useState<AirQualityData | null>(null);
   const [sunTimes, setSunTimes] = useState<SunTimes | null>(null);
+  const [notableBirds, setNotableBirds] = useState<NotableBird[]>([]);
   const [bibleVerse, setBibleVerse] = useState<BibleVerse | null>(null);
 
   // Loading states
@@ -108,7 +110,7 @@ function HomeScreen({navigation}: HomeScreenProps): React.JSX.Element {
     setDataLoading(true);
 
     try {
-      const [cityData, weatherData, tidesData, airQualityData, sunTimesData, verseData] =
+      const [cityData, weatherData, tidesData, airQualityData, sunTimesData, birdsData, verseData] =
         await Promise.allSettled([
           GeocodingService.getInstance().getCityFromCoordinates(
             location.latitude,
@@ -132,6 +134,12 @@ function HomeScreen({navigation}: HomeScreenProps): React.JSX.Element {
               location.longitude,
             ),
           ),
+          BirdingService.getInstance().getNotableObservations(
+            location.latitude,
+            location.longitude,
+            25,
+            1,
+          ),
           BibleService.getInstance().getVerseOfTheDay(),
         ]);
 
@@ -149,6 +157,9 @@ function HomeScreen({navigation}: HomeScreenProps): React.JSX.Element {
       }
       if (sunTimesData.status === 'fulfilled') {
         setSunTimes(sunTimesData.value);
+      }
+      if (birdsData.status === 'fulfilled') {
+        setNotableBirds(birdsData.value);
       }
       if (verseData.status === 'fulfilled') {
         setBibleVerse(verseData.value);
@@ -209,6 +220,10 @@ function HomeScreen({navigation}: HomeScreenProps): React.JSX.Element {
 
       if (airQuality) {
         speech += AirQualityService.getInstance().getAirQualitySpeechText(airQuality) + ' ';
+      }
+
+      if (notableBirds.length > 0 && location) {
+        speech += BirdingService.getInstance().getBirdingSpeechText(notableBirds, location.latitude, location.longitude) + ' ';
       }
 
       if (bibleVerse) {
@@ -345,6 +360,25 @@ function HomeScreen({navigation}: HomeScreenProps): React.JSX.Element {
                   <Text style={[styles.aqiCategory, textStyle]}>
                     {airQuality.category}
                   </Text>
+                </View>
+              )}
+
+              {/* Notable Birds */}
+              {notableBirds.length > 0 && location && (
+                <View style={[styles.card, {backgroundColor: isDarkMode ? '#1a1a1a' : '#f5f5f5'}]}>
+                  <Text style={[styles.cardTitle, textStyle]}>Notable Birds 🦅</Text>
+                  {notableBirds.slice(0, 3).map((bird, index) => (
+                    <View key={index} style={styles.birdRow}>
+                      <View style={styles.birdInfo}>
+                        <Text style={[styles.birdName, textStyle]}>
+                          {bird.comName}
+                        </Text>
+                        <Text style={[styles.birdLocation, textStyle]}>
+                          {bird.locName}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
                 </View>
               )}
 
@@ -578,6 +612,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     opacity: 0.6,
+  },
+  birdRow: {
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(128, 128, 128, 0.2)',
+  },
+  birdInfo: {
+    flex: 1,
+  },
+  birdName: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  birdLocation: {
+    fontSize: 14,
+    opacity: 0.7,
   },
 });
 

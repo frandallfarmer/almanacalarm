@@ -10,6 +10,7 @@ import AirQualityService from '../services/AirQualityService';
 import SunTimesService from '../services/SunTimesService';
 import GeocodingService from '../services/GeocodingService';
 import BibleService from '../services/BibleService';
+import BirdingService from '../services/BirdingService';
 import TTSService from '../services/TTSService';
 
 export const getGreeting = (hour: number): string => {
@@ -44,12 +45,13 @@ export const speakAlmanac = async (): Promise<void> => {
     console.log('Location obtained:', location.latitude, location.longitude);
 
     // Fetch all data in parallel
-    const [cityInfo, weather, tides, airQuality, sunTimes, bibleVerse] = await Promise.allSettled([
+    const [cityInfo, weather, tides, airQuality, sunTimes, notableBirds, bibleVerse] = await Promise.allSettled([
       GeocodingService.getInstance().getCityFromCoordinates(location.latitude, location.longitude),
       WeatherService.getInstance().getWeather(location.latitude, location.longitude),
       TideService.getInstance().getTidePredictions(location.latitude, location.longitude),
       AirQualityService.getInstance().getAirQuality(location.latitude, location.longitude),
       Promise.resolve(SunTimesService.getInstance().getSunTimes(location.latitude, location.longitude)),
+      BirdingService.getInstance().getNotableObservations(location.latitude, location.longitude, 25, 1),
       BibleService.getInstance().getVerseOfTheDay(),
     ]);
 
@@ -89,6 +91,10 @@ export const speakAlmanac = async (): Promise<void> => {
 
     if (airQuality.status === 'fulfilled' && airQuality.value) {
       speech += AirQualityService.getInstance().getAirQualitySpeechText(airQuality.value) + ' ';
+    }
+
+    if (notableBirds.status === 'fulfilled' && notableBirds.value && notableBirds.value.length > 0) {
+      speech += BirdingService.getInstance().getBirdingSpeechText(notableBirds.value, location.latitude, location.longitude) + ' ';
     }
 
     if (bibleVerse.status === 'fulfilled' && bibleVerse.value) {

@@ -8,6 +8,7 @@ A bespoke alarm clock for Android that speaks your morning briefing in a human v
 - Sunrise and sunset times with civil twilight
 - Tide information for the next 24 hours (current tide and upcoming high/low tides)
 - Air quality index and category (PM2.5, PM10)
+- Notable bird sightings (rare/unusual birds in your area from eBird)
 - Daily Bible verse (KJV)
 
 ## Features
@@ -21,6 +22,7 @@ A bespoke alarm clock for Android that speaks your morning briefing in a human v
 - **Tide Information**: Tide predictions from NOAA for coastal areas
 - **Air Quality**: Current air quality index and particulate levels from Open-Meteo
 - **Sun Times**: Calculates sunrise and sunset times using astronomical algorithms
+- **Bird Sightings**: Notable rare bird sightings in 25km radius from eBird API
 - **Daily Bible Verse**: 31 curated verses rotating daily (KJV)
 - **Dark/Light Mode**: Adaptive UI theme support
 - **Repeating Alarms**: Support for one-time and daily repeating alarms
@@ -35,6 +37,7 @@ A bespoke alarm clock for Android that speaks your morning briefing in a human v
   - Open-Meteo (weather and air quality - free, no API key)
   - NOAA Tides & Currents (tide predictions)
   - OpenStreetMap Nominatim (geocoding)
+  - eBird API 2.0 (notable bird observations)
 - **Native Libraries**:
   - react-native-geolocation-service (location)
   - react-native-tts (text-to-speech)
@@ -134,6 +137,7 @@ almanacalarm/
 │   ├── AirQualityService.ts    # Fetches air quality data
 │   ├── SunTimesService.ts      # Calculates sunrise/sunset
 │   ├── GeocodingService.ts     # Reverse geocoding for city names
+│   ├── BirdingService.ts       # Fetches notable bird sightings from eBird
 │   ├── TTSService.ts           # Text-to-speech functionality
 │   └── AlarmService.ts         # Alarm scheduling and management
 ├── App.tsx                     # Main application component
@@ -150,6 +154,7 @@ All services follow the singleton pattern and are initialized on app start:
 - **AirQualityService**: Gets current air quality index and particulate levels
 - **SunTimesService**: Calculates astronomical times using NOAA Solar Calculator algorithms
 - **GeocodingService**: Reverse geocodes coordinates to city names via OpenStreetMap Nominatim
+- **BirdingService**: Fetches notable/rare bird sightings from eBird API within 25km radius from last 24 hours
 - **BibleService**: Fetches daily Bible verses from bible-api.com with 31-verse rotation
 - **TTSService**: Manages text-to-speech engine configuration and playback
 - **AlarmService**: Schedules and manages alarms using Notifee
@@ -191,7 +196,7 @@ You can also manually trigger the almanac announcement:
 
 **Sample Announcement:**
 
-> "Good morning. It is 8:30 AM, Friday, October 10th, 2025. Your location is Portland, Oregon. The temperature is 62 degrees Fahrenheit with partly cloudy skies. Humidity is 75%. Wind speed is 8 miles per hour. Sunrise at 7:12 AM, sunset at 6:45 PM. Current tide is 4.3 feet. Next high tide at 2:15 PM, 7.8 feet. Air quality is good with an index of 42. Today's verse: For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life. John 3:16."
+> "Good morning. It is 8:30 AM, Friday, October 18th, 2025. Your location is Point Reyes, California. The temperature is 58 degrees Fahrenheit with clear sky. Humidity is 82%. Wind speed is 7 miles per hour. Sunrise at 7:24 AM, sunset at 6:22 PM. Current tide is 3.2 feet. Next high tide at 11:45 AM, 5.8 feet. Air quality is good with an index of 35. Notable bird sightings: Black-throated Gray Warbler at Point Reyes National Seashore yesterday. Peregrine Falcon at Bolinas Lagoon 5 hours ago. Today's verse: For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life. John 3:16."
 
 ### Permissions
 
@@ -223,6 +228,26 @@ The app requires the following Android permissions:
 - **iOS Support**: Not yet available for iOS devices
 
 ## Version History
+
+### v1.1.0 (2025-10-18) - Bird Sightings Feature
+
+**New Features:**
+- ✅ **Notable Bird Sightings** - Integration with eBird API 2.0 to announce rare/unusual bird sightings
+  - Fetches notable birds within 25km radius from last 24 hours
+  - Announces top 3 most recent sightings with location names and time
+  - Displays on home screen with "Notable Birds 🦅" card
+  - 6-hour caching to reduce API calls
+  - Example: "Black-throated Gray Warbler at Point Reyes National Seashore yesterday"
+
+**Technical Changes:**
+- Added `BirdingService.ts` with eBird API integration
+- Updated `AlmanacSpeaker.ts` to include birding in alarm announcements
+- Updated `HomeScreen.tsx` to fetch and display notable birds
+- Location names displayed instead of distances for better context
+
+**API Integration:**
+- eBird API 2.0 `/data/obs/geo/recent/notable` endpoint
+- Uses existing eBird API key from bird-photo-tagger project
 
 ### v1.0.0 (2025-10-14) - First Stable Release
 
@@ -294,5 +319,6 @@ Randy Farmer (frandallfarmer)
 - Weather and air quality data provided by Open-Meteo.com
 - Tide predictions from NOAA Tides & Currents
 - Geocoding via OpenStreetMap Nominatim
+- Notable bird observations from eBird API 2.0
 - Bible verses from bible-api.com
 - Astronomical calculations based on NOAA Solar Calculator algorithms
