@@ -4,8 +4,9 @@ A bespoke alarm clock for Android that speaks your morning briefing in a human v
 
 - Current time and date with dynamic greetings
 - Location (nearest city)
-- Weather conditions (temperature, conditions, humidity, wind, precipitation)
-- Sunrise and sunset times with civil twilight
+- Weather forecast (today's high/low temperatures, general conditions, precipitation probability)
+- Current weather conditions (temperature, humidity, wind, precipitation)
+- Sunrise and sunset times (accurate with timezone/DST handling)
 - Tide information for the next 24 hours (current tide and upcoming high/low tides)
 - Air quality index and category (PM2.5, PM10)
 - Notable bird sightings (rare/unusual birds in your area from eBird)
@@ -18,10 +19,11 @@ A bespoke alarm clock for Android that speaks your morning briefing in a human v
 - **Dynamic Greetings**: Time-appropriate greetings (Good morning/afternoon/evening/night)
 - **Location-Based**: Automatically gets your location and nearest city
 - **Background Location**: Full support for location access when app is closed or phone is sleeping
-- **Weather Data**: Real-time weather from Open-Meteo API (free, no API key required)
+- **Weather Forecast**: Daily high/low temperatures, general conditions (sunny/rainy/cloudy), precipitation probability
+- **Current Weather**: Real-time conditions, temperature, humidity, wind from Open-Meteo API (free, no API key)
 - **Tide Information**: Tide predictions from NOAA for coastal areas
 - **Air Quality**: Current air quality index and particulate levels from Open-Meteo
-- **Sun Times**: Calculates sunrise and sunset times using astronomical algorithms
+- **Sun Times**: Accurate sunrise/sunset times from Open-Meteo API with automatic timezone/DST handling
 - **Bird Sightings**: Notable rare bird sightings in 25km radius from eBird API
 - **Daily Bible Verse**: 31 curated verses rotating daily (KJV)
 - **Dark/Light Mode**: Adaptive UI theme support
@@ -196,7 +198,7 @@ You can also manually trigger the almanac announcement:
 
 **Sample Announcement:**
 
-> "Good morning. It is 8:30 AM, Friday, October 18th, 2025. Your location is Point Reyes, California. The temperature is 58 degrees Fahrenheit with clear sky. Humidity is 82%. Wind speed is 7 miles per hour. Sunrise at 7:24 AM, sunset at 6:22 PM. Current tide is 3.2 feet. Next high tide at 11:45 AM, 5.8 feet. Air quality is good with an index of 35. Notable bird sightings: Black-throated Gray Warbler at Point Reyes National Seashore yesterday. Peregrine Falcon at Bolinas Lagoon 5 hours ago. Today's verse: For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life. John 3:16."
+> "Good morning. It is 8:30 AM, Friday, October 22nd, 2025. Your location is Point Reyes, California. Today's weather will be mostly sunny. Currently clear sky with a temperature of 58 degrees. Today's high will be 68 and low 52. Humidity 82 percent. Wind speed 7 miles per hour. Sunrise at 7:24 AM, sunset at 6:22 PM. Current tide is 3.2 feet. Next high tide at 11:45 AM, 5.8 feet. Air quality is good with an index of 35. Notable bird sightings: Black-throated Gray Warbler at Point Reyes National Seashore yesterday. Peregrine Falcon at Bolinas Lagoon 5 hours ago. Today's verse: For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life. John 3:16."
 
 ### Permissions
 
@@ -216,8 +218,8 @@ The app requires the following Android permissions:
 
 - [ ] **Phase of Moon**: Current moon phase (new, waxing crescent, full, etc.)
 - [ ] **Days Until End of Year**: Countdown to year-end
-- [ ] **Daily Temperature Forecast**: Predicted high/low temperatures for the day
-- [ ] **General Weather Conditions**: Enhanced weather descriptions (rainy, overcast, sunny, etc.)
+- [x] **Daily Temperature Forecast**: ~~Predicted high/low temperatures for the day~~ ✅ Completed in v1.2.0
+- [x] **General Weather Conditions**: ~~Enhanced weather descriptions (rainy, overcast, sunny, etc.)~~ ✅ Completed in v1.2.0
 - [ ] **Custom Voice Recording**: Record and use your own voice instead of TTS
 - [ ] **Configurable Content**: Choose which data to announce
 - [ ] **Snooze Functionality**: Configurable snooze options
@@ -232,6 +234,31 @@ The app requires the following Android permissions:
 - **iOS Support**: Not yet available for iOS devices
 
 ## Version History
+
+### v1.2.0 (2025-10-22) - Weather Forecast & Enhanced Conditions
+
+**New Features:**
+- ✅ **Daily Temperature Forecast** - Announces today's predicted high and low temperatures
+- ✅ **Enhanced Weather Descriptions** - General conditions spoken naturally (sunny, rainy, cloudy, stormy, etc.)
+- ✅ **Precipitation Probability** - Announces chance of rain when over 30%
+- ✅ **Improved Sunrise/Sunset** - Switched from astronomical calculations to Open-Meteo API for accurate timezone/DST handling
+
+**User Experience:**
+- Weather announcement now starts with general forecast: "Today's weather will be mostly sunny"
+- Includes high/low temps: "Today's high will be 68 and low 52"
+- Only mentions precipitation when relevant (>30% chance)
+- Home screen displays forecast data with high/low temperatures
+
+**Technical Changes:**
+- Updated `WeatherService.ts` to fetch daily forecast data from Open-Meteo API
+- Added `getGeneralConditions()` method for human-friendly weather descriptions
+- Updated `SunTimesService.ts` to use Open-Meteo API instead of astronomical calculations
+- Enhanced `HomeScreen.tsx` to display forecast information
+- API now includes: `daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max`
+
+**Bug Fixes:**
+- Fixed sunrise/sunset times being incorrect due to timezone/DST issues
+- Times now accurately reflect local time with automatic DST adjustment
 
 ### v1.1.0 (2025-10-18) - Bird Sightings Feature
 

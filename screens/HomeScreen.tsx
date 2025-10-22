@@ -128,11 +128,9 @@ function HomeScreen({navigation}: HomeScreenProps): React.JSX.Element {
             location.latitude,
             location.longitude,
           ),
-          Promise.resolve(
-            SunTimesService.getInstance().getSunTimes(
-              location.latitude,
-              location.longitude,
-            ),
+          SunTimesService.getInstance().getSunTimes(
+            location.latitude,
+            location.longitude,
           ),
           BirdingService.getInstance().getNotableObservations(
             location.latitude,
@@ -319,6 +317,19 @@ function HomeScreen({navigation}: HomeScreenProps): React.JSX.Element {
                   <Text style={[styles.weatherCondition, textStyle]}>
                     {weather.conditions}
                   </Text>
+                  <View style={styles.forecastRow}>
+                    <Text style={[styles.forecastLabel, textStyle]}>
+                      High: {Math.round(weather.highTemp)}°F
+                    </Text>
+                    <Text style={[styles.forecastLabel, textStyle]}>
+                      Low: {Math.round(weather.lowTemp)}°F
+                    </Text>
+                  </View>
+                  {weather.precipitationProbability > 0 && (
+                    <Text style={[styles.weatherDetail, textStyle]}>
+                      Precipitation: {weather.precipitationProbability}% chance
+                    </Text>
+                  )}
                   <Text style={[styles.weatherDetail, textStyle]}>
                     Humidity: {weather.humidity}% | Wind: {Math.round(weather.windSpeed)} mph
                   </Text>
@@ -525,6 +536,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
     opacity: 0.7,
+  },
+  forecastRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  forecastLabel: {
+    fontSize: 16,
+    fontWeight: '500',
   },
   sunTimesRow: {
     flexDirection: 'row',

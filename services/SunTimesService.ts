@@ -1,6 +1,6 @@
 /**
  * Sun Times Service
- * Calculates sunrise and sunset times using astronomical algorithms
+ * Fetches sunrise and sunset times from Open-Meteo API
  */
 
 export interface SunTimes {
@@ -10,8 +10,19 @@ export interface SunTimes {
   dusk: Date; // Civil twilight end
 }
 
+interface OpenMeteoSunResponse {
+  daily?: {
+    time: string[];
+    sunrise: string[];
+    sunset: string[];
+  };
+  error?: boolean;
+  reason?: string;
+}
+
 class SunTimesService {
   private static instance: SunTimesService;
+  private readonly BASE_URL = 'https://api.open-meteo.com/v1/forecast';
 
   private constructor() {}
 
@@ -23,129 +34,58 @@ class SunTimesService {
   }
 
   /**
-   * Calculate Julian date from Date object
+   * Get sun times for location from Open-Meteo API
+   * Uses timezone=auto to get times in local timezone with DST handling
    */
-  private toJulian(date: Date): number {
-    return date.getTime() / 86400000 + 2440587.5;
-  }
+  async getSunTimes(latitude: number, longitude: number): Promise<SunTimes> {
+    try {
+      // Request today's sunrise/sunset with automatic timezone detection
+      const url = `${this.BASE_URL}?latitude=${latitude}&longitude=${longitude}&daily=sunrise,sunset&timezone=auto&forecast_days=1`;
 
-  /**
-   * Calculate sun position for given date and location
-   * Uses simplified algorithm from NOAA Solar Calculator
-   */
-  private calculateSunTimes(
-    latitude: number,
-    longitude: number,
-    date: Date,
-    zenith: number,
-    isSunrise: boolean,
-  ): Date | null {
-    const julianDay = this.toJulian(date);
-    const julianCentury = (julianDay - 2451545.0) / 36525.0;
+      console.log('[SunTimesService] Fetching sun times from Open-Meteo API...');
 
-    // Sun's mean anomaly
-    const sunMeanAnomaly =
-      357.52911 + julianCentury * (35999.05029 - 0.0001537 * julianCentury);
+      const response = await fetch(url);
 
-    // Sun's true longitude
-    const sunEquationOfCenter =
-      Math.sin((sunMeanAnomaly * Math.PI) / 180) *
-        (1.914602 - julianCentury * (0.004817 + 0.000014 * julianCentury)) +
-      Math.sin((2 * sunMeanAnomaly * Math.PI) / 180) *
-        (0.019993 - 0.000101 * julianCentury) +
-      Math.sin((3 * sunMeanAnomaly * Math.PI) / 180) * 0.000289;
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
 
-    const sunTrueLongitude =
-      (357.52911 +
-        julianCentury * (35999.05029 - 0.0001537 * julianCentury) +
-        sunEquationOfCenter) %
-      360;
+      const data: OpenMeteoSunResponse = await response.json();
 
-    // Sun's declination
-    const sunDeclination =
-      (Math.asin(
-        Math.sin((23.439 * Math.PI) / 180) *
-          Math.sin((sunTrueLongitude * Math.PI) / 180),
-      ) *
-        180) /
-      Math.PI;
+      if (data.error || !data.daily || !data.daily.sunrise || !data.daily.sunset) {
+        throw new Error(data.reason || 'Failed to fetch sun times');
+      }
 
-    // Hour angle
-    const cosHourAngle =
-      (Math.cos((zenith * Math.PI) / 180) -
-        Math.sin((latitude * Math.PI) / 180) *
-          Math.sin((sunDeclination * Math.PI) / 180)) /
-      (Math.cos((latitude * Math.PI) / 180) *
-        Math.cos((sunDeclination * Math.PI) / 180));
+      // Parse ISO 8601 timestamps (already in local timezone from API)
+      const sunrise = new Date(data.daily.sunrise[0]);
+      const sunset = new Date(data.daily.sunset[0]);
 
-    if (cosHourAngle > 1 || cosHourAngle < -1) {
-      return null; // Sun never rises or sets
+      // Calculate approximate civil twilight times (±30 minutes from sunrise/sunset)
+      const dawn = new Date(sunrise.getTime() - 30 * 60 * 1000);
+      const dusk = new Date(sunset.getTime() + 30 * 60 * 1000);
+
+      console.log('[SunTimesService] Sun times fetched successfully');
+      console.log(`  Sunrise: ${sunrise.toLocaleTimeString()}`);
+      console.log(`  Sunset: ${sunset.toLocaleTimeString()}`);
+
+      return {
+        sunrise,
+        sunset,
+        dawn,
+        dusk,
+      };
+    } catch (error) {
+      console.error('[SunTimesService] Error fetching sun times:', error);
+
+      // Return current time as fallback
+      const now = new Date();
+      return {
+        sunrise: now,
+        sunset: now,
+        dawn: now,
+        dusk: now,
+      };
     }
-
-    const hourAngle = (Math.acos(cosHourAngle) * 180) / Math.PI;
-
-    // Calculate time
-    const solarNoon =
-      (720 - 4 * longitude - sunEquationOfCenter + date.getTimezoneOffset()) /
-      1440;
-
-    const sunriseTime = solarNoon - (hourAngle * 4) / 1440;
-    const sunsetTime = solarNoon + (hourAngle * 4) / 1440;
-
-    // Choose sunrise or sunset based on parameter (reversed due to calculation quirk)
-    const timeValue = isSunrise ? sunsetTime : sunriseTime;
-    const hours = timeValue * 24;
-    const result = new Date(date);
-    result.setHours(Math.floor(hours));
-    result.setMinutes(Math.round((hours % 1) * 60));
-    result.setSeconds(0);
-    result.setMilliseconds(0);
-    return result;
-  }
-
-  /**
-   * Get sun times for location and date
-   */
-  getSunTimes(latitude: number, longitude: number, date: Date = new Date()): SunTimes {
-    // Zenith angles
-    const SUNRISE_SUNSET_ZENITH = 90.833; // Official sunrise/sunset
-    const CIVIL_TWILIGHT_ZENITH = 96; // Civil twilight
-
-    const sunrise = this.calculateSunTimes(
-      latitude,
-      longitude,
-      date,
-      SUNRISE_SUNSET_ZENITH,
-      true, // sunrise
-    );
-    const sunset = this.calculateSunTimes(
-      latitude,
-      longitude,
-      date,
-      SUNRISE_SUNSET_ZENITH,
-      false, // sunset
-    );
-    const dawn = this.calculateSunTimes(
-      latitude,
-      longitude,
-      date,
-      CIVIL_TWILIGHT_ZENITH,
-      true, // dawn (sunrise for twilight)
-    );
-    const dusk = this.calculateSunTimes(
-      latitude,
-      longitude,
-      date,
-      CIVIL_TWILIGHT_ZENITH,
-      false, // dusk (sunset for twilight)
-    );
-
-    return {
-      sunrise: sunrise || new Date(),
-      sunset: sunset || new Date(),
-      dawn: dawn || new Date(),
-      dusk: dusk || new Date(),
-    };
   }
 
   /**

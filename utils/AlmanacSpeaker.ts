@@ -50,7 +50,7 @@ export const speakAlmanac = async (): Promise<void> => {
       WeatherService.getInstance().getWeather(location.latitude, location.longitude),
       TideService.getInstance().getTidePredictions(location.latitude, location.longitude),
       AirQualityService.getInstance().getAirQuality(location.latitude, location.longitude),
-      Promise.resolve(SunTimesService.getInstance().getSunTimes(location.latitude, location.longitude)),
+      SunTimesService.getInstance().getSunTimes(location.latitude, location.longitude),
       BirdingService.getInstance().getNotableObservations(location.latitude, location.longitude, 25, 1),
       BibleService.getInstance().getVerseOfTheDay(),
     ]);
