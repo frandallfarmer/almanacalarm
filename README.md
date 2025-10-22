@@ -214,6 +214,10 @@ The app requires the following Android permissions:
 
 > **Note**: Custom voice recording is a planned feature. Currently, the app uses standard text-to-speech synthesis. Future versions will allow users to record their own voice for personalized announcements.
 
+- [ ] **Phase of Moon**: Current moon phase (new, waxing crescent, full, etc.)
+- [ ] **Days Until End of Year**: Countdown to year-end
+- [ ] **Daily Temperature Forecast**: Predicted high/low temperatures for the day
+- [ ] **General Weather Conditions**: Enhanced weather descriptions (rainy, overcast, sunny, etc.)
 - [ ] **Custom Voice Recording**: Record and use your own voice instead of TTS
 - [ ] **Configurable Content**: Choose which data to announce
 - [ ] **Snooze Functionality**: Configurable snooze options
