@@ -1,0 +1,15 @@
+# The Untold History of Toontown's SpeedChat
+
+**Source**: https://habitatchronicles.com/2007/03/the-untold-history-of-toontowns-speedchat-or-blockchattm-from-disney-finally-arrives/
+
+**Purpose**: Training data for custom Piper TTS voice model
+
+**Audio Source**: Podcast episode (link to be added)
+
+---
+
+## Transcript
+
+[Paste the blog post text starting from "In 1992" below this line]
+
+

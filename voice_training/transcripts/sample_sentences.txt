@@ -1,0 +1,64 @@
+# Sample Almanac Sentences for Voice Training
+
+**Source**: VOICE_RECORDING_GUIDE.md sample script
+
+**Purpose**: Domain-specific language for Almanac Alarm app (weather, dates, times, locations)
+
+**Recording Status**: To be recorded
+
+---
+
+## Recording Instructions
+
+Record yourself reading these varied almanac-style announcements. Read naturally, as if you're actually delivering the morning almanac to someone.
+
+- Maintain consistent distance from microphone (6-12 inches)
+- Speak at your natural pace
+- Take breaks between sections
+- Re-record any mistakes immediately
+
+---
+
+## Sample Script
+
+Good morning. It is seven thirty AM, Monday, January fifteenth, twenty twenty-five.
+Your location is San Francisco, California.
+
+Today's weather will be partly cloudy. Currently clear sky with a temperature of
+fifty-eight degrees. Today's high will be sixty-eight and low fifty-two.
+
+The temperature is forty-two degrees Fahrenheit with clear sky.
+Humidity is seventy-five percent. Wind speed is eight miles per hour.
+
+Sunrise at seven twenty-four AM, sunset at six twenty-two PM.
+
+Current tide is three point two feet. Next high tide at eleven forty-five AM,
+seven point eight feet. Next low tide at five thirty PM, one point one feet.
+
+Air quality is good with an index of thirty-five.
+
+Notable bird sightings: American Robin at Golden Gate Park yesterday.
+Black-throated Gray Warbler at Point Reyes National Seashore two days ago.
+
+Today's verse: For God so loved the world, that he gave his only begotten Son,
+that whosoever believeth in him should not perish, but have everlasting life.
+John three sixteen.
+
+Good afternoon. It is two fifteen PM, Tuesday, March eighth.
+Good evening. It is seven forty-five PM, Friday, October tenth.
+Good night. It is eleven thirty PM, Saturday, December twentieth.
+
+The temperature ranges from twenty degrees to ninety degrees Fahrenheit.
+Wind speeds vary from zero to fifty miles per hour.
+Humidity levels range from ten to one hundred percent.
+
+---
+
+## After Recording
+
+1. Process audio in Audacity (normalize, noise reduction)
+2. Export as WAV (22050 Hz, 16-bit PCM, Mono)
+3. Segment into individual sentences (1-15 seconds each)
+4. Save to `voice_training/audio/` directory
+5. Update `voice_training/metadata.csv` with entries
+6. Verify all files are ready for training

@@ -1,0 +1,10 @@
+# Voice Training Metadata
+# Format: filename.wav|Transcription text
+# Do NOT include this header in the actual training file
+# Remove all comment lines (starting with #) before uploading to Google Colab
+#
+# Example entries:
+# line_0001.wav|In 1992, I co-founded a company called Electric Communities with Chip Morningstar.
+# line_0002.wav|We had worked together on various virtual worlds projects.
+#
+# Add your training data below:
