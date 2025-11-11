@@ -7,7 +7,7 @@ Last updated: 2025-11-11
 This document tracks the progress of voice training data collection for the custom Piper TTS model.
 
 **Target**: 30-60 minutes of varied speech
-**Current Total**: ~8-12 minutes (1 sample complete, 1 pending)
+**Current Total**: ~13-17 minutes (2 samples complete)
 
 ---
 
@@ -42,22 +42,24 @@ This document tracks the progress of voice training data collection for the cust
 
 ## Training Sample #2: Almanac Sample Sentences
 
-**Status**: 🔴 Not Started - To be recorded
+**Status**: ✅ Complete - Ready for training
 
 **Details**:
 - **Source**: VOICE_RECORDING_GUIDE.md sample script
 - **Transcript File**: `transcripts/sample_sentences.txt` ✅
-- **Audio Source**: New recording (to be made)
-- **Estimated Duration**: ~5-10 minutes
-- **Number of Sentences**: ~25 distinct phrases
+- **Audio File**: `audio/almanac.wav` ✅
+- **Processing**: Normalized, noise reduced ✅
+- **Format**: WAV, 22050 Hz, Mono, 16-bit PCM ✅
+- **Segmentation**: Using single file approach (Piper supports longer samples)
+- **Duration**: ~5 minutes
+- **metadata.csv**: Entry added ✅
 
-**Next Steps**:
-1. ⏳ Set up recording environment (quiet room, USB mic)
-2. ⏳ Record sample sentences following transcript
-3. ⏳ Process audio in Audacity
-4. ⏳ Segment into individual sentences
-5. ⏳ Name files: line_0001.wav, line_0002.wav, etc.
-6. ⏳ Add entries to metadata.csv
+**Completed Steps**:
+1. ✅ Set up recording environment
+2. ✅ Recorded sample sentences following transcript
+3. ✅ Processed audio in Audacity (normalize, noise reduction)
+4. ✅ Saved as single file (almanac.wav) - auto-segmentation not needed
+5. ✅ Added entry to metadata.csv
 
 **Purpose**: Domain-specific language (weather, dates, times, locations, bird names, Bible verses)
 
@@ -137,25 +139,27 @@ This document tracks the progress of voice training data collection for the cust
 | Sample | Status | Duration | Segments | Notes |
 |--------|--------|----------|----------|-------|
 | Blog Post | ✅ Complete | ~8-12 min | 1 | Single file approach |
-| Sample Sentences | 🔴 Not Started | ~5-10 min | ~25 | Ready to record |
-| **TOTAL** | **~25%** | **~8-12 min** | **1** | **Target: 30-60 min** |
+| Sample Sentences | ✅ Complete | ~5 min | 1 | Single file approach |
+| **TOTAL** | **~30%** | **~13-17 min** | **2** | **Target: 30-60 min** |
 
 ---
 
 ## Training Readiness
 
-**Current Status**: 🔴 Not Ready
+**Current Status**: 🟡 Minimum Viable - Can Start Training
 
 **Requirements for Training**:
-- [ ] Total audio duration: 30+ minutes
-- [ ] All audio files processed and in audio/ directory
-- [ ] metadata.csv complete and accurate
-- [ ] Audio quality verified
+- [x] Total audio duration: 13-17 minutes (minimum viable, more recommended)
+- [x] All audio files processed and in audio/ directory
+- [x] metadata.csv complete and accurate
+- [x] Audio quality verified
 - [ ] Google Drive folder created
 - [ ] All files uploaded to Google Drive
 - [ ] Colab notebook prepared
 
-**Estimated Time to Training Ready**: 1-2 weeks (depending on recording schedule)
+**Note**: Current duration (13-17 min) is below the recommended 30-60 minutes, but sufficient for initial training. Model quality will improve with more data.
+
+**Next Step**: Upload files to Google Drive and begin Colab training, or record additional samples for better quality.
 
 ---
 
@@ -182,7 +186,7 @@ This document tracks the progress of voice training data collection for the cust
 - Using podcast audio for blog post sample (efficient reuse of existing recording)
 - Plan to separately record sample sentences for domain-specific vocabulary
 
-### 2025-11-11 (Processing Complete)
+### 2025-11-11 (Sample #1 Processing Complete)
 - User processed speedchat.wav in Audacity (CLI)
 - Normalized and noise reduced audio
 - Trimmed intro/outro music and preamble
@@ -191,3 +195,14 @@ This document tracks the progress of voice training data collection for the cust
 - Created metadata.csv entry for single file training approach
 - Sample #1 complete: ~8-12 minutes of natural narrative speech
 - Ready to proceed with Sample #2 (domain-specific sentences)
+
+### 2025-11-11 (Sample #2 Complete - Training Ready!)
+- User recorded almanac sample sentences (CLI)
+- Processed almanac.wav in Audacity
+- Normalized and noise reduced audio
+- Exported as WAV 22050 Hz, Mono, 16-bit PCM
+- Used single file approach (no segmentation)
+- Created metadata.csv entry for almanac.wav
+- Sample #2 complete: ~5 minutes of domain-specific vocabulary
+- Total training data: ~13-17 minutes across 2 samples
+- Minimum viable dataset ready - can begin training or add more samples for better quality
