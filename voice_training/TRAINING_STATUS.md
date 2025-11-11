@@ -7,30 +7,34 @@ Last updated: 2025-11-11
 This document tracks the progress of voice training data collection for the custom Piper TTS model.
 
 **Target**: 30-60 minutes of varied speech
-**Current Total**: 0 minutes
+**Current Total**: ~8-12 minutes (1 sample complete, 1 pending)
 
 ---
 
 ## Training Sample #1: Blog Post - "Toontown's SpeedChat"
 
-**Status**: 🟡 Ready for Local Processing - Transcript complete, audio URL documented
+**Status**: ✅ Complete - Ready for training
 
 **Details**:
 - **Source URL**: https://habitatchronicles.com/2007/03/the-untold-history-of-toontowns-speedchat-or-blockchattm-from-disney-finally-arrives/
 - **Transcript File**: `transcripts/blog_post_speedchat.txt` ✅
 - **Audio Source**: Podcast episode S01E08 - "Disney's HercWorld, ToonTown, and BlockChat™"
 - **Audio URL**: https://socialmediaclarity.net/podcasts/138068-disney-s-hercworld-toontown-and-blockchat-tm-s01e08.mp3
-- **Audio File**: To be downloaded locally (CCWeb network restrictions prevent download)
-- **Estimated Duration**: ~8-12 minutes (reading portion only, after trimming intro/outro)
+- **Audio File**: `audio/speedchat.wav` ✅
+- **Processing**: Normalized, noise reduced, intro/outro trimmed ✅
+- **Format**: WAV, 22050 Hz, Mono, 16-bit PCM ✅
+- **Segmentation**: Using single file approach (Piper supports longer samples)
+- **Duration**: ~8-12 minutes
 - **Text Length**: ~1,350 words
+- **metadata.csv**: Entry added ✅
 
-**Next Steps (CLI Required)**:
+**Completed Steps**:
 1. ✅ Transcript complete
-2. ⏳ Download podcast audio file locally (see raw/.gitkeep for command)
-3. ⏳ Extract relevant segment from podcast (trim intro/outro music and preamble)
-4. ⏳ Process audio in Audacity (normalize, noise reduction)
-5. ⏳ Segment into sentences (save as line_0001.wav, line_0002.wav, etc.)
-6. ⏳ Add entries to metadata.csv
+2. ✅ Downloaded podcast audio file locally
+3. ✅ Extracted relevant segment from podcast (trimmed intro/outro music and preamble)
+4. ✅ Processed audio in Audacity (normalize, noise reduction)
+5. ✅ Saved as single file (speedchat.wav) - auto-segmentation not needed
+6. ✅ Added entry to metadata.csv
 
 **Purpose**: Natural narrative speech with varied vocabulary, storytelling tone
 
@@ -132,9 +136,9 @@ This document tracks the progress of voice training data collection for the cust
 
 | Sample | Status | Duration | Segments | Notes |
 |--------|--------|----------|----------|-------|
-| Blog Post | 🔴 Pending | ? min | ? | Awaiting transcript & audio |
+| Blog Post | ✅ Complete | ~8-12 min | 1 | Single file approach |
 | Sample Sentences | 🔴 Not Started | ~5-10 min | ~25 | Ready to record |
-| **TOTAL** | **0%** | **0 min** | **0** | **Target: 30-60 min** |
+| **TOTAL** | **~25%** | **~8-12 min** | **1** | **Target: 30-60 min** |
 
 ---
 
@@ -168,11 +172,22 @@ This document tracks the progress of voice training data collection for the cust
 
 ## Notes & Observations
 
-### 2025-11-11
+### 2025-11-11 (Initial Setup)
 - Created voice_training directory structure
 - Set up metadata.csv template
 - Created transcript placeholders for both training samples
-- Blog post transcript awaiting user input
+- Added complete blog post transcript (1,350 words)
+- Documented podcast audio URL
 - Sample sentences ready for recording
 - Using podcast audio for blog post sample (efficient reuse of existing recording)
 - Plan to separately record sample sentences for domain-specific vocabulary
+
+### 2025-11-11 (Processing Complete)
+- User processed speedchat.wav in Audacity (CLI)
+- Normalized and noise reduced audio
+- Trimmed intro/outro music and preamble
+- Exported as WAV 22050 Hz, Mono, 16-bit PCM
+- Decided against auto-segmentation (Piper supports longer samples)
+- Created metadata.csv entry for single file training approach
+- Sample #1 complete: ~8-12 minutes of natural narrative speech
+- Ready to proceed with Sample #2 (domain-specific sentences)
