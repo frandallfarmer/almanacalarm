@@ -10,6 +10,88 @@
 
 ## Transcript
 
-[Paste the blog post text starting from "In 1992" below this line]
+In 1992, I co-founded a company with Chip Morningstar and Douglas Crockford named Electric Communities. We initially did a lot of consulting for various media companies that were looking to leverage the emerging online gaming industry. One of those companies was Disney.
 
+Disney had formed a group to look into taking the brand online, including a full-fledged multiplayer experience as early as 1996, when the were considering a product called HercWorld, which was to leverage the upcoming movie franchise Hercules. Having built Lucasfilm's Habitat and WorldsAway, we were clearly amongst a handful of teams that had successfully constructed social virtual worlds that'd made any real money, and Crock had media connections from his days a Paramount, so they brought us in to discuss what it would take to build a kid-safe virtual world experience.
+
+They had hired their own expert to lead the project, a former product manager for Knowledge Adventure – a kid's software company that'd done some 3D work as well as their own online project KA-Worlds, which was meant to link sick children in hospitals together using computers and avatars.
+
+Disney makes no bones about how tightly they want to control and protect their brand, and rightly so. Disney means "Safe For Kids". There could be no swearing, no sex, no innuendo, and nothing that would allow one child (or adult pretending to be a child) to upset another.
+
+I found myself unable to reconcile the idea of a virtual world, where kids would run around, play with objects, and chat with each other without someone saying or doing something that might upset another. Even in 1996, we knew that text-filters are no good at solving this kind of problem, so I asked for a clarification: "I'm confused. What standard should we use to decide if a message would be a problem for Disney?"
+
+The response was one I will never forget: "Disney's standard is quite clear:
+
+No kid will be harassed, even if they don't know they are being harassed."
+
+"So much for no-harm, no-foul," Chip grumbled, quietly. This requirement lead me to some deep thinking over the coming weeks and months about a moderation design I called "The Disney Panopticon", but that's a post for another day…
+
+"OK. That means Chat Is Out of HercWorld, there is absolutely no way to meet your standard without exorbitantly high moderation costs," we replied.
+
+One of their guys piped up: "Couldn't we do some kind of sentence constructor, with a limited vocabulary of safe words?"
+
+Before we could give it any serious thought, their own project manager interrupted, "That won't work. We tried it for KA-Worlds."
+
+"We spent several weeks building a UI that used pop-downs to construct sentences, and only had completely harmless words – the standard parts of grammar and safe nouns like cars, animals, and objects in the world."
+
+"We thought it was the perfect solution, until we set our first 14-year old boy down in front of it. Within minutes he'd created the following sentence:
+
+I want to stick my long-necked Giraffe up your fluffy white bunny.
+
+KA-Worlds abandoned that approach. Electric Communities is right, chat is out."
+
+That was pretty much settled, but it felt like we had collectively gutted the project. After all, if the kids can't chat, how could they coordinate? It'd end up being more like a world where you could see other players playing but you couldn't really work with them much. [Side note: Sadly, a lot of MMORPG play is like this anyway, see Playing Alone Together.]
+
+As I starting daydreaming about how to get chat back into this project, we moved on to what activities the kids might do in the now-chat-free HercWorld. It was standard fare: Collect stuff, ride stuff, shoot at stuff, build stuff… Oops, what was that last thing again?
+
+"…kids can push around Roman columns and blocks to solve puzzles, make custom shapes, and buildings.", one of the designers said.
+
+I couldn't resist, "Umm. Doesn't that violate the Disney standard? In this chat-free world, people will push the stones around until they spell Hi! or F-U-C-K or their phone number or whatever. You've just invented Block-Chattm. If you can put down objects, you've got chat. We learned this in Habitat and WorldsAway, where people would turn 100 Afro-Heads into a waterbed." We all laughed, but it was that kind of awkward laugh that you know means that we're all probably just wasting our time.
+
+HercWorld never happened.
+
+Once again, into the breech
+Electric Communities moved on, renamed itself Communities.com (which has nothing in common with the current company/site using that name and url.) and did some wonderful design work on a giant multimedia 3D kid's world for Cartoon Network, which ended up being much too ambitious to fund, but I mention it because the project was headed by Brian Bowman. Brian eventually left Atlanta for Disney, where he was in charge of the online experience for Zoog Disney, a pre-teen programming block. Brian remembered his work with us and asked us to help build a world for the Zoog audience. Nothing so extravagant this time, just something simple, like The Palace (which, by then had been acquired by Communities.com.), a no-download, in-browser, 2D graphical chat with some programmed object capabilities.
+
+"The Disney Standard" (now a legend amongst our employees) still held. No harassment, detectable or not, and no heavy moderation overhead.
+
+Brian had an idea though: Fully pre-constructed sentences – dozens of them, easy to access. Specialize them for the activities available in the world. Vaz Douglas, our project manager working with Zoog, liked to call this feature "Chatless Chat." So, we built and launched it for them. Disney was still very tentative about the genre, so the only ran it for about six months; I doubt it was ever very popular.
+
+Third time's a charm
+But the concept resurfaced at Disney a few years later [2002] in the form of SpeedChat in ToonTown. It was refined – you select a subject and then from a submenu of sentences, each automatically customized to the correct context. Selecting "I need to find …", would magically insert the names of the items you have quests for. For all walk-up users, all interactions would be via SpeedChat.
+
+They added a method to allow direct chat between users that involves the exchange of secret codes that are generated for each user (with parental permission). The idea is that kids would print them out and give them to each other on the playground. This was a great way for Disney to end-run the standard – since Speed Chat was an effective method of preventing the exchange of these codes, and theoretically the codes had to be given "in-person", making the recipient not-a-stranger. Sure, some folks post them
+on message boards, but presumably those are folks who 1) are adults, or 2) know each other, right? In any case, as long as no one could pass secret codes within Toontown itself, Disney feels safe.
+
+The Ghost of BlockChattm past
+Soon after ToonTown opened its doors, they added Toon Estates – a feature that gives you a house with furniture, initially just a bed, gumball machine, chair, and armoire. Then they added the ability to buy more furniture of all shapes and sizes from catalogs, and then you could invite people to visit your house to see how you have arranged all your cool stuff.
+
+Sure enough, chatters figured out a few simple protocols to pass their secret code, several variants are of this general form:
+
+User A:"Please be my friend."
+User A:"Come to my house?"
+User B:"Okay."
+A:[Move the picture frames on your wall, or move your furniture on the floor to make the number 4.]
+A:"Okay"
+B:[Writes down 4 on a piece of paper and says] "Okay."
+A:[Move objects to make the next letter/number in the code] "Okay"
+B:[Writes…] "Okay"
+A:[Remove objects to represent a "space" in the code] "Okay"
+[Repeat steps as needed, until…]
+A:"Okay"
+B:[Enters secret code into Toontown software.]
+B:"There, that worked. Hi! I'm Jim 15/M/CA, what's your A/S/L?"
+
+Passing bits in my ToonTown Estate
+
+It seems that many of The Lessons of Lucasfilm's Habitat still ring true.
+I'll consider this as The SpeedChat Corollary:
+
+By hook, or by crook, customers will always find a way to connect with each other.
+
+P.S: Brian tells me that Cartoon Network is actually resuming the project, more than ten years later; "… now that is being ahead of your time."
+
+[Thanks to the legendary Robin Hood of Neopets for telling me about this Secret Code exchange prototcol.]
+
+[Yes, the BlockChattm brand is a joke.]
 
