@@ -4,7 +4,9 @@
 
 **Purpose**: Training data for custom Piper TTS voice model
 
-**Audio Source**: Podcast episode (link to be added)
+**Audio Source**: Podcast episode S01E08 - "Disney's HercWorld, ToonTown, and BlockChat™"
+**Audio URL**: https://socialmediaclarity.net/podcasts/138068-disney-s-hercworld-toontown-and-blockchat-tm-s01e08.mp3
+**Note**: Contains intro/outro music and preamble - needs trimming to extract just the blog post reading
 
 ---
 

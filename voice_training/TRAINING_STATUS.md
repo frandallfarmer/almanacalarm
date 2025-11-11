@@ -13,25 +13,26 @@ This document tracks the progress of voice training data collection for the cust
 
 ## Training Sample #1: Blog Post - "Toontown's SpeedChat"
 
-**Status**: 🔴 In Progress - Awaiting transcript and audio
+**Status**: 🟡 Ready for Local Processing - Transcript complete, audio URL documented
 
 **Details**:
 - **Source URL**: https://habitatchronicles.com/2007/03/the-untold-history-of-toontowns-speedchat-or-blockchattm-from-disney-finally-arrives/
-- **Transcript File**: `transcripts/blog_post_speedchat.txt`
-- **Audio Source**: Podcast episode
-- **Audio File**: [Link pending]
-- **Estimated Duration**: Unknown
-- **Text starts with**: "In 1992..."
+- **Transcript File**: `transcripts/blog_post_speedchat.txt` ✅
+- **Audio Source**: Podcast episode S01E08 - "Disney's HercWorld, ToonTown, and BlockChat™"
+- **Audio URL**: https://socialmediaclarity.net/podcasts/138068-disney-s-hercworld-toontown-and-blockchat-tm-s01e08.mp3
+- **Audio File**: To be downloaded locally (CCWeb network restrictions prevent download)
+- **Estimated Duration**: ~8-12 minutes (reading portion only, after trimming intro/outro)
+- **Text Length**: ~1,350 words
 
-**Next Steps**:
-1. ⏳ Paste blog post text into transcript file
-2. ⏳ Obtain podcast audio file
-3. ⏳ Extract relevant segment from podcast
-4. ⏳ Process audio in Audacity
-5. ⏳ Segment into sentences
+**Next Steps (CLI Required)**:
+1. ✅ Transcript complete
+2. ⏳ Download podcast audio file locally (see raw/.gitkeep for command)
+3. ⏳ Extract relevant segment from podcast (trim intro/outro music and preamble)
+4. ⏳ Process audio in Audacity (normalize, noise reduction)
+5. ⏳ Segment into sentences (save as line_0001.wav, line_0002.wav, etc.)
 6. ⏳ Add entries to metadata.csv
 
-**Purpose**: Natural narrative speech with varied vocabulary
+**Purpose**: Natural narrative speech with varied vocabulary, storytelling tone
 
 ---
 
