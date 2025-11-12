@@ -2,6 +2,12 @@
 
 This guide walks you through training your custom Piper TTS voice model using Google Colab (completely free!).
 
+## ⚠️ CRITICAL: Audio Segmentation Required
+
+**IMPORTANT**: The audio files in this repo (speedchat.wav, almanac.wav) are **TOO LONG** for training on free Colab GPUs. You **MUST** segment them into **5-15 second clips** before training, or you will encounter "CUDA out of memory" errors.
+
+**Do NOT attempt to train with the current long files.** See "Audio Preparation Requirements" section below.
+
 ## What is Google Colab?
 
 Google Colab is a free cloud-based coding environment that runs in your web browser. It gives you access to powerful GPU computers for training machine learning models without needing any special hardware.
@@ -10,20 +16,23 @@ Google Colab is a free cloud-based coding environment that runs in your web brow
 
 ## What You'll Do
 
-1. Upload your audio files to Google Drive
-2. Open a pre-made training notebook
-3. Click "Run" on each step
-4. Wait 6-12 hours while it trains
-5. Download your trained voice model
+1. **Segment audio files** into 5-15 second clips (REQUIRED)
+2. Upload segmented audio files to Google Drive
+3. Open a pre-made training notebook
+4. Configure and run training cells
+5. Wait 6-12 hours while it trains
+6. Download your trained voice model
 
 ## Prerequisites
 
 - ✅ Google account (Gmail)
-- ✅ ~30MB free space in Google Drive
-- ✅ Training files ready (you have these!)
-  - speedchat.wav (22MB)
-  - almanac.wav (5.2MB)
-  - metadata.csv
+- ✅ ~500MB free space in Google Drive (for segmented files)
+- ✅ Audio segmentation tool (Audacity, FFmpeg, or Python script)
+- ✅ Training files prepared:
+  - Multiple WAV files (5-15 seconds each)
+  - metadata.csv with entries for each segment
+
+**Note**: Current files (speedchat.wav, almanac.wav) need segmentation before use.
 
 ---
 
@@ -62,12 +71,55 @@ From your local machine (`almanacalarm/voice_training/`):
 
 ---
 
+## Step 1.5: Audio Preparation Requirements ⚠️ CRITICAL
+
+**Before uploading to Google Drive, you MUST segment your audio files.**
+
+### Why Segmentation is Required
+
+Free Colab GPUs (T4) have ~15GB memory, but long audio files consume too much GPU RAM during training:
+- **5+ minute files**: Will fail with "CUDA out of memory" even at batch_size=1
+- **1-2 minute files**: May work but risky
+- **5-15 second files**: Optimal for free GPU training
+
+### Segmentation Options
+
+**Option 1: Audacity (GUI)**
+1. Open your audio file in Audacity
+2. Select 5-15 second segments
+3. File → Export → Export Selected Audio
+4. Save as WAV, 22050 Hz, Mono, 16-bit PCM
+5. Repeat for each segment
+
+**Option 2: FFmpeg (Command Line)**
+```bash
+# Segment audio into 10-second chunks
+ffmpeg -i speedchat.wav -f segment -segment_time 10 -c copy speedchat_%03d.wav
+```
+
+**Option 3: Python Script** (coming soon)
+
+### Update metadata.csv
+
+For each segment, add an entry:
+```
+speedchat_001.wav|In 1992, I co-founded a company with Chip Morningstar and Douglas Crockford named Electric Communities.
+speedchat_002.wav|We initially did a lot of consulting for various media companies that were looking to leverage the emerging online gaming industry.
+speedchat_003.wav|One of those companies was Disney.
+```
+
+**Important**: Each line must match the exact transcript for that audio segment.
+
+---
+
 ## Step 2: Open the Training Notebook (2 minutes)
 
 ### 2.1 Access the Notebook
 
-Click this link to open the Piper training notebook:
-👉 https://colab.research.google.com/github/rmcpantoja/piper/blob/master/notebooks/piper_multilingual_training_notebook.ipynb
+**Use this notebook (tested and working):**
+👉 https://colab.research.google.com/github/natlamir/ProjectFiles/blob/main/Piper/Piper_Training.ipynb
+
+**DO NOT use the official rmcpantoja notebook** - it has missing dependencies (piper-phonemize) that prevent training from working.
 
 ### 2.2 Make Your Own Copy
 
@@ -116,39 +168,39 @@ drive.mount('/content/drive')
 
 ---
 
-## Step 5: Configure Training Parameters (3 minutes)
+## Step 5: Configure Training Parameters (5 minutes)
 
-Look for the configuration section in the notebook. You'll need to set:
+The natlamir notebook uses form-based configuration. Fill in these fields:
 
-### 5.1 Path to Your Data
+### 5.1 Dataset Format
 
-Find the cell that sets the data path and change it to:
-```python
-data_path = '/content/drive/MyDrive/piper_training'
-```
+Select: **`ljspeech`** (standard format for custom voice training)
 
-### 5.2 Language Setting
+### 5.2 Language
 
-```python
-language = 'en-us'  # or 'en_US' depending on notebook format
-```
+Select: **`en_US`** (English - United States)
 
-### 5.3 Quality Setting
+### 5.3 Dataset Path
 
-```python
-quality = 'medium'  # Good balance of quality and training speed
-```
+Enter: `/content/drive/MyDrive/piper_training`
 
-**Quality options:**
-- `low` - Fastest (3-4 hours), decent quality
-- `medium` - Balanced (6-8 hours), good quality ← **Recommended**
-- `high` - Slowest (10-12 hours), best quality
+This is where you uploaded your wavs folder and metadata.csv.
 
-### 5.4 Model Name (Optional)
+### 5.4 Training Parameters
 
-```python
-model_name = 'randy_farmer_voice'  # Or any name you want
-```
+**Recommended settings for first training:**
+- **Batch Size**: `8` (or `4` if you get memory errors)
+- **Quality**: `medium` (good balance)
+- **Epochs**: `100` (will take 6-12 hours)
+
+**If you get "CUDA out of memory" errors:**
+1. First, ensure audio is segmented (5-15 seconds)
+2. If still failing, reduce batch_size to `4` or `2`
+3. Add flags: `--data.validation_split 0.0 --data.num_test_examples 0`
+
+### 5.5 Optional: Model Name
+
+Give your model a name like `randy_farmer_voice` or leave default.
 
 ---
 
@@ -267,6 +319,45 @@ Some notebooks include a test cell:
 
 ## Common Issues & Solutions
 
+### Issue: "CUDA out of memory" (MOST COMMON)
+
+**Error message:**
+```
+torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 4.83 GiB
+```
+
+**Cause:** Audio files are too long for GPU memory during training
+
+**Solution:**
+1. **Segment audio files** into 5-15 second clips (see Step 1.5)
+2. Update metadata.csv with individual segments
+3. Restart notebook and try again
+
+**This is the #1 reason training fails on free Colab.** Do NOT skip audio segmentation.
+
+### Issue: "No training batches available"
+
+**Error message:**
+```
+INFO:piper_train.vits.lightning:No training batches available
+```
+
+**Cause:** Validation split consumed all data (happens with very few samples)
+
+**Solution:**
+Add these flags when running training:
+```bash
+--data.validation_split 0.0 --data.num_test_examples 0
+```
+
+### Issue: "ModuleNotFoundError: No module named 'piper_phonemize'"
+
+**Cause:** Using the wrong notebook (rmcpantoja version)
+
+**Solution:**
+- Use the natlamir notebook instead: https://colab.research.google.com/github/natlamir/ProjectFiles/blob/main/Piper/Piper_Training.ipynb
+- The official notebook has broken dependencies
+
 ### Issue: "Runtime disconnected"
 
 **Cause:** Colab has usage limits (~12 hours per session)
@@ -276,34 +367,26 @@ Some notebooks include a test cell:
 - Click "Reconnect"
 - Training resumes from last checkpoint
 
-### Issue: "Out of memory"
-
-**Cause:** T4 GPU doesn't have enough RAM
-
-**Solution:**
-- Try `quality = 'low'` instead of medium
-- Or split into smaller training batches (notebook should handle this)
-
 ### Issue: "Can't find metadata.csv"
 
-**Cause:** File path is wrong
+**Cause:** File path is wrong or Drive not mounted
 
 **Solution:**
-- Double-check path: `/content/drive/MyDrive/piper_training`
-- Make sure you mounted Drive first
-- Verify files are in correct folders
+1. Verify Drive is mounted: Look for "Mounted at /content/drive" message
+2. Check path: `/content/drive/MyDrive/piper_training`
+3. Verify files uploaded correctly in Google Drive
 
 ### Issue: Training loss not decreasing
 
 **Cause:**
-- Not enough training data (you have minimum viable)
+- Not enough training data
 - Audio quality issues
 - Mismatch between audio and transcript
 
 **Solution:**
 - Let it train longer (sometimes takes 20-30 epochs to start improving)
 - If loss stays above 2.0 after 50 epochs, check audio/transcript alignment
-- May need more training data for better results
+- Record more training data (aim for 30-60 minutes total)
 
 ### Issue: Generated voice sounds robotic
 
@@ -313,8 +396,8 @@ Some notebooks include a test cell:
 
 **Solution:**
 - Train longer if loss is still decreasing
-- Record more samples and retrain
-- Try `quality = 'high'` for next training
+- Record more samples and retrain (30-60 min recommended)
+- Try higher quality setting
 
 ---
 
@@ -393,11 +476,89 @@ Once you have your trained model files:
 
 ## Your Files Checklist
 
-Before starting, verify you have:
-- [x] speedchat.wav - in Google Drive `piper_training/wavs/`
-- [x] almanac.wav - in Google Drive `piper_training/wavs/`
-- [x] metadata.csv - in Google Drive `piper_training/`
-- [x] Google account with Drive access
-- [x] Modern web browser (Chrome/Firefox recommended)
+Before starting training, verify you have:
+- [ ] **Segmented audio files** (5-15 seconds each) - in Google Drive `piper_training/wavs/`
+- [ ] **Updated metadata.csv** (with entries for each segment) - in Google Drive `piper_training/`
+- [ ] Google account with Drive access
+- [ ] Modern web browser (Chrome/Firefox recommended)
 
-**Ready?** Open the notebook link and let's train! 🚀
+**Note**: The repository contains speedchat.wav and almanac.wav, but these are **too long** for training. You must segment them first (see Step 1.5).
+
+**Ready?** After segmenting your audio, open the notebook link and let's train!
+
+---
+
+## Lessons Learned from Real Training Attempts
+
+This section documents issues encountered during actual training attempts (November 2025).
+
+### What Didn't Work
+
+1. **Official rmcpantoja notebook**
+   - Missing `piper-phonemize` dependency
+   - Multiple installation attempts failed
+   - **Don't use this notebook**
+
+2. **Long audio files (8-12 minutes)**
+   - Caused "CUDA out of memory" errors
+   - Failed even with batch_size=1
+   - T4 GPU has ~15GB total, but training long files requires more
+   - **Must segment audio before training**
+
+3. **Single-file training approach**
+   - Initially thought Piper could handle long files
+   - Documentation suggested this was possible
+   - Reality: Free GPU can't handle it
+   - **Need proper segmentation**
+
+### What Worked
+
+1. **Natlamir notebook**
+   - All dependencies install correctly
+   - Clear form-based configuration
+   - Successfully starts training with proper data
+
+2. **Segmented audio files (5-15 seconds)**
+   - Fits within GPU memory constraints
+   - Standard approach for voice training
+   - Matches how Piper was designed to work
+
+3. **Validation split workaround**
+   - For small datasets (2-10 files), use `--data.validation_split 0.0`
+   - Prevents "no training batches" error
+
+### Alternative Approaches
+
+If you can't or don't want to segment audio manually:
+
+1. **Paid cloud GPU services**
+   - Google Colab Pro (~$10/month) - more GPU memory
+   - Paperspace, Lambda Labs, etc.
+   - May handle longer files
+
+2. **Local training**
+   - If you have NVIDIA GPU (16GB+ VRAM)
+   - Install Piper locally
+   - Train without cloud limitations
+
+3. **Use existing voices**
+   - Piper has many pre-trained voices
+   - May be "good enough" for initial release
+   - Can train custom voice later
+
+### Realistic Expectations
+
+- **Minimum data**: 10-15 minutes segmented audio (60-90 clips of 10 seconds each)
+- **Recommended data**: 30-60 minutes (180-360 clips)
+- **Training time**: 6-12 hours on free Colab
+- **Quality**: Acceptable with 15 min, good with 30+ min
+- **Voice similarity**: Won't be perfect, but recognizable
+
+### Next Steps After This Guide
+
+Once you have a trained model:
+1. Test it thoroughly with various text
+2. Identify weaknesses (specific words, intonations)
+3. Record more targeted training data if needed
+4. Retrain with combined dataset
+5. Integrate into Almanac Alarm app (see `/PIPER_INTEGRATION_PLAN.md`)
