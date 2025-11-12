@@ -52,14 +52,12 @@ I couldn't resist, "Umm. Doesn't that violate the Disney standard? In this chat-
 
 HercWorld never happened.
 
-Once again, into the breech
 Electric Communities moved on, renamed itself Communities.com (which has nothing in common with the current company/site using that name and url.) and did some wonderful design work on a giant multimedia 3D kid's world for Cartoon Network, which ended up being much too ambitious to fund, but I mention it because the project was headed by Brian Bowman. Brian eventually left Atlanta for Disney, where he was in charge of the online experience for Zoog Disney, a pre-teen programming block. Brian remembered his work with us and asked us to help build a world for the Zoog audience. Nothing so extravagant this time, just something simple, like The Palace (which, by then had been acquired by Communities.com.), a no-download, in-browser, 2D graphical chat with some programmed object capabilities.
 
 "The Disney Standard" (now a legend amongst our employees) still held. No harassment, detectable or not, and no heavy moderation overhead.
-
+ 
 Brian had an idea though: Fully pre-constructed sentences – dozens of them, easy to access. Specialize them for the activities available in the world. Vaz Douglas, our project manager working with Zoog, liked to call this feature "Chatless Chat." So, we built and launched it for them. Disney was still very tentative about the genre, so the only ran it for about six months; I doubt it was ever very popular.
 
-Third time's a charm
 But the concept resurfaced at Disney a few years later [2002] in the form of SpeedChat in ToonTown. It was refined – you select a subject and then from a submenu of sentences, each automatically customized to the correct context. Selecting "I need to find …", would magically insert the names of the items you have quests for. For all walk-up users, all interactions would be via SpeedChat.
 
 They added a method to allow direct chat between users that involves the exchange of secret codes that are generated for each user (with parental permission). The idea is that kids would print them out and give them to each other on the playground. This was a great way for Disney to end-run the standard – since Speed Chat was an effective method of preventing the exchange of these codes, and theoretically the codes had to be given "in-person", making the recipient not-a-stranger. Sure, some folks post them
@@ -70,28 +68,20 @@ Soon after ToonTown opened its doors, they added Toon Estates – a feature that
 
 Sure enough, chatters figured out a few simple protocols to pass their secret code, several variants are of this general form:
 
-User A:"Please be my friend."
-User A:"Come to my house?"
-User B:"Okay."
-A:[Move the picture frames on your wall, or move your furniture on the floor to make the number 4.]
-A:"Okay"
-B:[Writes down 4 on a piece of paper and says] "Okay."
-A:[Move objects to make the next letter/number in the code] "Okay"
+User A:"Please be my friend." "Come to my house?"
+User B responds:"Okay." Those are all speedchat phrases.
+User A moves picture frames on his wall, or his furniture on to make the number 4.  
+User B [Writes down 4 on a piece of paper and responds] "Okay."
+User A then once again moves the objects around to make the next letter or number in the code "Okay"
 B:[Writes…] "Okay"
-A:[Remove objects to represent a "space" in the code] "Okay"
-[Repeat steps as needed, until…]
-A:"Okay"
-B:[Enters secret code into Toontown software.]
-B:"There, that worked. Hi! I'm Jim 15/M/CA, what's your A/S/L?"
-
-Passing bits in my ToonTown Estate
+And so on until the entire code is transmitted.
+Then User B Enters the secret code into Toontown software.
+And the next chat message you see "There, that worked. Hi! I'm Jim 15/M/CA, what's your A/S/L?"
 
 It seems that many of The Lessons of Lucasfilm's Habitat still ring true.
 I'll consider this as The SpeedChat Corollary:
 
 By hook, or by crook, customers will always find a way to connect with each other.
-
-P.S: Brian tells me that Cartoon Network is actually resuming the project, more than ten years later; "… now that is being ahead of your time."
 
 [Thanks to the legendary Robin Hood of Neopets for telling me about this Secret Code exchange prototcol.]
 
