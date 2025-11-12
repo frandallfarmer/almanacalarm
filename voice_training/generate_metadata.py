@@ -28,6 +28,17 @@ def extract_paragraphs(text, content_marker):
         if len(parts) > 1:
             text = parts[1]
 
+    # Normalize whitespace-only lines to empty lines
+    # This treats lines with only spaces/tabs as blank lines
+    lines = text.split('\n')
+    normalized_lines = []
+    for line in lines:
+        if line.strip() == '':
+            normalized_lines.append('')
+        else:
+            normalized_lines.append(line)
+    text = '\n'.join(normalized_lines)
+
     # Split on double newlines (blank lines)
     # This regex matches 2 or more newlines
     paragraphs = re.split(r'\n\n+', text)
