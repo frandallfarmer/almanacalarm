@@ -75,3 +75,6 @@ yarn-error.log
 
 # Build logs
 build.log
+
+# Voice training - ignore large training artifacts
+voice_training/*.onnx
