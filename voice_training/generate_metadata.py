@@ -118,12 +118,12 @@ def main():
         content_marker="## Transcript"
     )
 
-    # Process Almanac (11 files)
+    # Process Almanac (10 files)
     print("Processing Almanac transcript...")
     almanac_entries = process_transcript(
         os.path.join(base_dir, "transcripts/sample_sentences.txt"),
         "Almanac",
-        11,
+        10,
         content_marker="## Sample Script"
     )
 
