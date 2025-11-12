@@ -1,12 +1,13 @@
 #!/bin/bash
 # Extended training command for Randy Farmer voice
-# Continue from epoch 2270 checkpoint and train 2-4x longer for better quality
+# Continue from epoch 2693 checkpoint to reduce metallic quality
 
-# Original training: 106 epochs (2164→2270)
-# For 2x training: 212 more epochs (→2482 total)
-# For 4x training: 424 more epochs (→2694 total)
+# Training history:
+# - Original: 106 epochs (2164→2270)
+# - v2: 423 epochs (2270→2693)
+# - v3: Continue for another 424-848 epochs
 
-# RECOMMENDED: Start with 4x training (424 more epochs)
+# RECOMMENDED: Train another 848 epochs (2x the v2 training) to epoch 3541
 python3 -m piper.train fit \
   --data.voice_name "randy_farmer" \
   --data.csv_path "/content/drive/MyDrive/piper_training/metadata.csv" \
@@ -18,10 +19,15 @@ python3 -m piper.train fit \
   --data.batch_size 4 \
   --data.validation_split 0.1 \
   --data.num_test_examples 2 \
-  --trainer.max_epochs 2694 \
-  --ckpt_path "/content/drive/MyDrive/piper_training/checkpoints/epoch=2270-step=1908.ckpt"
+  --trainer.max_epochs 3541 \
+  --trainer.default_root_dir "/content/drive/MyDrive/piper_training" \
+  --ckpt_path "/content/drive/MyDrive/piper_training/checkpoints/epoch=2693-step=9522.ckpt"
 
-# Key changes:
-# 1. --trainer.max_epochs 2694 (4x training) or 2482 (2x training)
-# 2. --ckpt_path points to YOUR epoch 2270 checkpoint (not the pretrained one)
-# 3. With $10 GPU credit, you have several hours - 4x training should complete fine
+# Options:
+# - For 1x more (424 epochs): --trainer.max_epochs 3117
+# - For 2x more (848 epochs): --trainer.max_epochs 3541 (recommended)
+#
+# Key changes from v2:
+# 1. --ckpt_path updated to epoch 2693 checkpoint (v2 endpoint)
+# 2. --trainer.max_epochs 3541 for 2x more training
+# 3. Added --trainer.default_root_dir to save checkpoints to Google Drive during training
