@@ -24,48 +24,48 @@ class TTSService {
   }
 
   /**
-   * Initialize TTS engine - tries Piper first, falls back to system TTS
+   * Initialize TTS engine with Piper voice and system TTS fallback
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) {
       return;
     }
 
-    // Try Piper TTS first
+    // Try to initialize Piper TTS (custom voice)
     try {
-      console.log('[TTSService] Attempting Piper TTS initialization...');
+      console.log('[TTSService] Initializing Piper TTS...');
       this.piperTTS = PiperTTSService.getInstance();
       await this.piperTTS.initialize();
       this.usePiper = true;
       console.log('[TTSService] ✅ Piper TTS initialized successfully');
     } catch (piperError) {
-      const errorMessage = piperError.message || String(piperError);
-      console.warn('[TTSService] ⚠️ Piper TTS initialization failed:', errorMessage);
+      console.error('[TTSService] ❌ Piper TTS failed, falling back to system TTS:', piperError);
       this.usePiper = false;
       this.piperTTS = null;
 
-      // Show visible error alert
+      // Show alert to user (non-blocking)
       const {Alert} = require('react-native');
+      const errorMessage = piperError?.message || String(piperError);
       Alert.alert(
         'Piper TTS Failed',
         `Using system voice instead.\n\nError: ${errorMessage}`,
         [{text: 'OK'}]
       );
+    }
 
-      // Initialize system TTS as fallback
-      try {
-        await Tts.setDefaultLanguage('en-US');
-        await Tts.setDefaultRate(0.5);
-        await Tts.setDefaultPitch(1.0);
-        const voices = await Tts.voices();
-        const preferredVoices = voices.filter((v: any) => v.language.startsWith('en-US'));
-        if (preferredVoices.length > 0) {
-          await Tts.setDefaultVoice(preferredVoices[0].id);
-        }
-        console.log('[TTSService] ✅ System TTS initialized as fallback');
-      } catch (systemError) {
-        console.error('[TTSService] ❌ System TTS also failed:', systemError);
+    // Initialize system TTS (either as fallback or primary)
+    try {
+      await Tts.setDefaultLanguage('en-US');
+      await Tts.setDefaultRate(0.5);
+      await Tts.setDefaultPitch(1.0);
+      const voices = await Tts.voices();
+      const preferredVoices = voices.filter((v: any) => v.language.startsWith('en-US'));
+      if (preferredVoices.length > 0) {
+        await Tts.setDefaultVoice(preferredVoices[0].id);
       }
+      console.log('[TTSService] ✅ System TTS initialized');
+    } catch (systemError) {
+      console.error('[TTSService] ❌ System TTS failed:', systemError);
     }
 
     this.isInitialized = true;
