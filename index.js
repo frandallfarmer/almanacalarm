@@ -17,33 +17,21 @@ notifee.onBackgroundEvent(async ({type, detail}) => {
   if (type === EventType.DELIVERED) {
     console.log('[index.js] Alarm DELIVERED in background!');
 
-    // Dynamically import services and initialize them
-    const TTSService = require('./services/TTSService').default;
+    // Dynamically import services
     const AlarmService = require('./services/AlarmService').default;
     const {speakAlmanac} = require('./utils/AlmanacSpeaker');
 
-    try {
-      console.log('[index.js] Initializing TTS...');
-      await TTSService.getInstance().initialize();
-      console.log('[index.js] TTS initialized');
-    } catch (error) {
-      console.error('[index.js] TTS initialization failed:', error);
-      // Speak the error so user knows what happened
-      const tts = TTSService.getInstance();
-      await tts.speak('TTS initialization failed: ' + error.message);
-    }
-
+    // Initialize AlarmService
     try {
       console.log('[index.js] Initializing AlarmService...');
       await AlarmService.getInstance().initialize();
       console.log('[index.js] AlarmService initialized');
     } catch (error) {
       console.error('[index.js] AlarmService initialization failed:', error);
-      const tts = TTSService.getInstance();
-      await tts.speak('Alarm service initialization failed: ' + error.message);
       return; // Can't continue without alarm service
     }
 
+    // Speak almanac (TTS will lazy-initialize when needed)
     try {
       console.log('[index.js] Speaking almanac...');
       await speakAlmanac();
@@ -56,9 +44,7 @@ notifee.onBackgroundEvent(async ({type, detail}) => {
       }
     } catch (error) {
       console.error('[index.js] Error speaking almanac:', error);
-      // Speak the error so user knows what happened
-      const tts = TTSService.getInstance();
-      await tts.speak('Error speaking almanac: ' + error.message);
+      // Error already logged, notification will remain visible for user
     }
 
     // Handle alarm cleanup (delete non-repeating alarms from schedule)

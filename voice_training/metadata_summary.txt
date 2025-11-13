@@ -1,0 +1,69 @@
+Metadata Generation Summary
+===========================
+
+Generated: metadata.csv
+Total entries: 43 audio files
+  - speedchat: 32 files
+  - Almanac: 11 files
+
+ISSUES TO RESOLVE:
+==================
+
+1. speedchat-32.wav - NO TRANSCRIPT FOUND
+   Currently marked as: [MISSING TRANSCRIPT]
+
+   Last paragraph in transcript ends with:
+   speedchat-31.wav: "[Yes, the BlockChattm brand is a joke.]"
+
+   ACTION NEEDED: Check if speedchat-32.wav is:
+   - An empty/silence segment that should be removed?
+   - Contains content not in the transcript?
+   - Transcript needs to be updated with additional content?
+
+2. Almanac-11.wav - NO TRANSCRIPT FOUND
+   Currently marked as: [MISSING TRANSCRIPT]
+
+   Last paragraph in transcript ends with:
+   Almanac-10.wav: "The temperature ranges from twenty degrees..."
+
+   ACTION NEEDED: Check if Almanac-11.wav is:
+   - An empty/silence segment that should be removed?
+   - Contains content not in the transcript?
+   - Transcript needs to be updated with additional content?
+
+VERIFICATION NEEDED:
+====================
+
+Please verify that the audio file order matches the paragraph order:
+
+Speedchat segments (01-31): ✓ Matched
+Almanac segments (01-10): ✓ Matched
+
+The script splits transcripts by paragraph breaks (double line breaks).
+Each audio file should contain the corresponding paragraph text.
+
+NEXT STEPS:
+===========
+
+1. Listen to speedchat-32.wav and Almanac-11.wav
+2. Either:
+   a) Add their transcripts to metadata.csv manually, OR
+   b) Update the transcript files with the missing content and re-run the script, OR
+   c) Delete the audio files if they're empty/unused
+3. Verify a few random entries match (e.g., play speedchat-05.wav and check it matches line 5)
+4. Upload to Google Drive for training
+
+SAMPLE ENTRIES:
+===============
+
+speedchat-01.wav | In 1992, I co-founded a company...
+speedchat-02.wav | Disney had formed a group to look into...
+...
+speedchat-31.wav | [Yes, the BlockChattm brand is a joke.]
+speedchat-32.wav | [MISSING TRANSCRIPT]
+
+Almanac-01.wav | Good morning. It is seven thirty AM...
+Almanac-02.wav | Today's weather will be partly cloudy...
+...
+Almanac-10.wav | The temperature ranges from twenty degrees...
+Almanac-11.wav | [MISSING TRANSCRIPT]

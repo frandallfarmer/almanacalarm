@@ -1,0 +1,3 @@
+# This directory will contain processed WAV files ready for training
+# Format: 22050 Hz, 16-bit PCM, Mono
+# Naming: line_0001.wav, line_0002.wav, etc.

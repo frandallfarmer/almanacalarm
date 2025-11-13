@@ -62,12 +62,8 @@ function App(): React.JSX.Element {
   // Initialize services on app start
   useEffect(() => {
     const initializeServices = async () => {
-      // Initialize TTS first (don't block on failure)
-      try {
-        await TTSService.getInstance().initialize();
-      } catch (error) {
-        console.error('TTS initialization failed (non-fatal):', error);
-      }
+      // TTS initialization removed - now lazy-loads when Speak Almanac is clicked
+      // This prevents crashes from Piper TTS initialization on app startup
 
       // Request battery optimization exemption first for network access during Doze mode
       try {

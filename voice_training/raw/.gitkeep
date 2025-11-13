@@ -1,0 +1,11 @@
+# This directory contains raw unprocessed recordings
+# These files are NOT uploaded to training
+# Use this for intermediate work before processing in Audacity
+
+# To download the SpeedChat podcast episode (CLI only):
+# curl -L -o speedchat_podcast_s01e08.mp3 "https://socialmediaclarity.net/podcasts/138068-disney-s-hercworld-toontown-and-blockchat-tm-s01e08.mp3"
+#
+# Or use wget:
+# wget -O speedchat_podcast_s01e08.mp3 "https://socialmediaclarity.net/podcasts/138068-disney-s-hercworld-toontown-and-blockchat-tm-s01e08.mp3"
+#
+# Then process in Audacity to extract the blog post reading segment
