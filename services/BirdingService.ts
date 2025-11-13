@@ -126,6 +126,11 @@ class BirdingService {
       const data: EBirdResponse[] = await response.json();
       console.log(`[BirdingService] Found ${data.length} notable bird(s)`);
 
+      if (!Array.isArray(data)) {
+        console.error('[BirdingService] API returned non-array:', typeof data);
+        return [];
+      }
+
       // Convert to our interface and add distance information
       const birds: NotableBird[] = data.map(bird => ({
         speciesCode: bird.speciesCode,
@@ -141,6 +146,7 @@ class BirdingService {
       // Cache the results
       this.cachedBirds = birds;
       this.lastFetchTime = now;
+      console.log(`[BirdingService] Cached ${birds.length} bird(s)`);
 
       return birds;
     } catch (error) {
