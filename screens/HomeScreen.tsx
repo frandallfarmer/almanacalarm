@@ -378,21 +378,27 @@ function HomeScreen({navigation}: HomeScreenProps): React.JSX.Element {
               )}
 
               {/* Notable Birds */}
-              {notableBirds.length > 0 && location && (
+              {location && (
                 <View style={[styles.card, {backgroundColor: isDarkMode ? '#1a1a1a' : '#f5f5f5'}]}>
                   <Text style={[styles.cardTitle, textStyle]}>Notable Birds 🦅</Text>
-                  {notableBirds.slice(0, 3).map((bird, index) => (
-                    <View key={index} style={styles.birdRow}>
-                      <View style={styles.birdInfo}>
-                        <Text style={[styles.birdName, textStyle]}>
-                          {bird.comName}
-                        </Text>
-                        <Text style={[styles.birdLocation, textStyle]}>
-                          {bird.locName}
-                        </Text>
+                  {notableBirds.length > 0 ? (
+                    notableBirds.slice(0, 3).map((bird, index) => (
+                      <View key={index} style={styles.birdRow}>
+                        <View style={styles.birdInfo}>
+                          <Text style={[styles.birdName, textStyle]}>
+                            {bird.comName}
+                          </Text>
+                          <Text style={[styles.birdLocation, textStyle]}>
+                            {bird.locName}
+                          </Text>
+                        </View>
                       </View>
-                    </View>
-                  ))}
+                    ))
+                  ) : (
+                    <Text style={[styles.birdLocation, textStyle]}>
+                      No notable bird sightings nearby for the last 24 hours.
+                    </Text>
+                  )}
                 </View>
               )}
 
