@@ -156,8 +156,11 @@ function HomeScreen({navigation}: HomeScreenProps): React.JSX.Element {
       if (sunTimesData.status === 'fulfilled') {
         setSunTimes(sunTimesData.value);
       }
-      if (birdsData.status === 'fulfilled') {
+      if (birdsData.status === 'fulfilled' && birdsData.value) {
+        console.log('[HomeScreen] Birds fetched:', birdsData.value.length);
         setNotableBirds(birdsData.value);
+      } else if (birdsData.status === 'rejected') {
+        console.error('[HomeScreen] Birds fetch failed:', birdsData.reason);
       }
       if (verseData.status === 'fulfilled') {
         setBibleVerse(verseData.value);
