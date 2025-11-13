@@ -81,6 +81,13 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    // Add repository for sherpa-onnx local AAR
+    repositories {
+        flatDir {
+            dirs "${project.rootDir}/../node_modules/react-native-sherpa-onnx-offline-tts/android/libs"
+        }
+    }
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -112,4 +119,7 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    // Add sherpa-onnx AAR for Piper TTS (needed because library uses compileOnly)
+    implementation files("${project.rootDir}/../node_modules/react-native-sherpa-onnx-offline-tts/android/libs/sherpa-onnx-1.10.35.aar")
 }

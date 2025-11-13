@@ -14,7 +14,8 @@ A bespoke alarm clock for Android that speaks your morning briefing in a human v
 
 ## Features
 
-- **Voice Announcements**: Uses text-to-speech to speak all almanac information
+- **Custom Voice**: Uses personalized Piper TTS voice model (Randy's voice) for natural-sounding announcements
+- **Offline TTS**: All voice synthesis happens on-device using neural voice model
 - **Background Alarms**: Alarms fire and speak almanac without launching the app UI
 - **Dynamic Greetings**: Time-appropriate greetings (Good morning/afternoon/evening/night)
 - **Location-Based**: Automatically gets your location and nearest city
@@ -42,7 +43,8 @@ A bespoke alarm clock for Android that speaks your morning briefing in a human v
   - eBird API 2.0 (notable bird observations)
 - **Native Libraries**:
   - react-native-geolocation-service (location)
-  - react-native-tts (text-to-speech)
+  - react-native-sherpa-onnx-offline-tts (offline TTS with Piper voice model)
+  - react-native-fs (file system for voice model assets)
   - @notifee/react-native (alarm notifications)
 
 ## Installation
@@ -140,8 +142,13 @@ almanacalarm/
 │   ├── SunTimesService.ts      # Calculates sunrise/sunset
 │   ├── GeocodingService.ts     # Reverse geocoding for city names
 │   ├── BirdingService.ts       # Fetches notable bird sightings from eBird
+│   ├── PiperTTSService.ts      # Piper voice model TTS engine
 │   ├── TTSService.ts           # Text-to-speech functionality
 │   └── AlarmService.ts         # Alarm scheduling and management
+├── voice_profiles/             # Voice model files (v2, 423 epochs)
+│   ├── voice-profile-randy-farmer.onnx
+│   ├── voice-profile-randy-farmer-tokens.txt
+│   └── espeak-ng-data/
 ├── App.tsx                     # Main application component
 └── package.json
 ```
@@ -158,6 +165,7 @@ All services follow the singleton pattern and are initialized on app start:
 - **GeocodingService**: Reverse geocodes coordinates to city names via OpenStreetMap Nominatim
 - **BirdingService**: Fetches notable/rare bird sightings from eBird API within 25km radius from last 24 hours
 - **BibleService**: Fetches daily Bible verses from bible-api.com with 31-verse rotation
+- **PiperTTSService**: Manages Piper neural voice model for speech synthesis (Randy's voice, v2)
 - **TTSService**: Manages text-to-speech engine configuration and playback
 - **AlarmService**: Schedules and manages alarms using Notifee
 - **BatteryOptimizationService**: Requests battery optimization exemption for reliable background operation
@@ -212,15 +220,25 @@ The app requires the following Android permissions:
 - `INTERNET` - For fetching weather, tide, air quality, and Bible verse data
 - `DISABLE_KEYGUARD` - For alarms to work when phone is locked
 
-## Future Enhancements
+## Voice Model
 
-> **Note**: Custom voice recording is a planned feature. Currently, the app uses standard text-to-speech synthesis. Future versions will allow users to record their own voice for personalized announcements.
+The app uses a custom Piper TTS voice model trained on Randy Farmer's voice:
+- **Version**: v2 (423 epochs training)
+- **Quality**: Good with slight metallic artifacts
+- **Size**: 61MB ONNX model
+- **Language**: en-US
+- **Training**: Continued from epoch 2270→2693 for enhanced quality
+
+A v3 model is currently in training (epoch 2693→3541) to further reduce metallic quality. See [VOICE_TRAINING_STATUS.md](VOICE_TRAINING_STATUS.md) for details.
+
+## Future Enhancements
 
 - [ ] **Phase of Moon**: Current moon phase (new, waxing crescent, full, etc.)
 - [ ] **Days Until End of Year**: Countdown to year-end
 - [x] **Daily Temperature Forecast**: ~~Predicted high/low temperatures for the day~~ ✅ Completed in v1.2.0
 - [x] **General Weather Conditions**: ~~Enhanced weather descriptions (rainy, overcast, sunny, etc.)~~ ✅ Completed in v1.2.0
-- [ ] **Custom Voice Recording**: Record and use your own voice instead of TTS
+- [x] **Custom Voice Model**: ~~Record and use your own voice instead of TTS~~ ✅ Completed - Using trained Piper voice model (v2)
+- [ ] **Improved Voice Quality**: Upgrade to v3 model when training completes
 - [ ] **Configurable Content**: Choose which data to announce
 - [ ] **Snooze Functionality**: Configurable snooze options
 - [ ] **Historical Data**: Track weather, tides, and air quality over time

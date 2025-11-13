@@ -1,13 +1,18 @@
 /**
  * Text-to-Speech Service
  * Handles converting text to speech for alarm announcements
+ * Uses custom Piper voice model via sherpa-onnx with fallback to system TTS
  */
 
+import PiperTTSService from './PiperTTSService';
 import Tts from 'react-native-tts';
 
 class TTSService {
   private static instance: TTSService;
+  private piperTTS: PiperTTSService | null = null;
   private isInitialized: boolean = false;
+  private usePiper: boolean = false;
+  private speechRate: number = 1.0; // Speed for Piper (1.0 = normal)
 
   private constructor() {}
 
@@ -19,51 +24,55 @@ class TTSService {
   }
 
   /**
-   * Initialize TTS engine
+   * Initialize TTS engine - tries Piper first, falls back to system TTS
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) {
       return;
     }
 
-    // Try to initialize, but don't fail if individual steps fail
+    // Try Piper TTS first
     try {
-      await Tts.setDefaultLanguage('en-US');
-    } catch (error) {
-      console.warn('Could not set TTS language:', error);
-    }
+      console.log('[TTSService] Attempting Piper TTS initialization...');
+      this.piperTTS = PiperTTSService.getInstance();
+      await this.piperTTS.initialize();
+      this.usePiper = true;
+      console.log('[TTSService] ✅ Piper TTS initialized successfully');
+    } catch (piperError) {
+      const errorMessage = piperError.message || String(piperError);
+      console.warn('[TTSService] ⚠️ Piper TTS initialization failed:', errorMessage);
+      this.usePiper = false;
+      this.piperTTS = null;
 
-    try {
-      await Tts.setDefaultRate(0.5);
-    } catch (error) {
-      console.warn('Could not set TTS rate:', error);
-    }
-
-    try {
-      await Tts.setDefaultPitch(1.0);
-    } catch (error) {
-      console.warn('Could not set TTS pitch:', error);
-    }
-
-    try {
-      const voices = await Tts.voices();
-      const preferredVoices = voices.filter((v: any) =>
-        v.language.startsWith('en-US'),
+      // Show visible error alert
+      const {Alert} = require('react-native');
+      Alert.alert(
+        'Piper TTS Failed',
+        `Using system voice instead.\n\nError: ${errorMessage}`,
+        [{text: 'OK'}]
       );
-      if (preferredVoices.length > 0) {
-        await Tts.setDefaultVoice(preferredVoices[0].id);
+
+      // Initialize system TTS as fallback
+      try {
+        await Tts.setDefaultLanguage('en-US');
+        await Tts.setDefaultRate(0.5);
+        await Tts.setDefaultPitch(1.0);
+        const voices = await Tts.voices();
+        const preferredVoices = voices.filter((v: any) => v.language.startsWith('en-US'));
+        if (preferredVoices.length > 0) {
+          await Tts.setDefaultVoice(preferredVoices[0].id);
+        }
+        console.log('[TTSService] ✅ System TTS initialized as fallback');
+      } catch (systemError) {
+        console.error('[TTSService] ❌ System TTS also failed:', systemError);
       }
-    } catch (error) {
-      console.warn('Could not set TTS voice:', error);
     }
 
-    // Mark as initialized even if some steps failed
     this.isInitialized = true;
-    console.log('TTS initialized (some features may be unavailable)');
   }
 
   /**
-   * Speak text
+   * Speak text using Piper voice or system TTS fallback
    */
   async speak(text: string): Promise<void> {
     if (!this.isInitialized) {
@@ -71,10 +80,27 @@ class TTSService {
     }
 
     try {
-      await Tts.speak(text);
+      if (this.usePiper && this.piperTTS) {
+        console.log('[TTSService] Speaking with Piper voice...');
+        await this.piperTTS.speak(text, this.speechRate);
+      } else {
+        console.log('[TTSService] Speaking with system TTS...');
+        await Tts.speak(text);
+      }
     } catch (error) {
-      console.error('Error speaking text:', error);
-      throw error;
+      console.error('[TTSService] Error speaking text:', error);
+      // Try fallback if Piper fails
+      if (this.usePiper) {
+        console.warn('[TTSService] Piper failed, trying system TTS...');
+        try {
+          await Tts.speak(text);
+        } catch (fallbackError) {
+          console.error('[TTSService] Fallback also failed:', fallbackError);
+          throw error;
+        }
+      } else {
+        throw error;
+      }
     }
   }
 
@@ -83,9 +109,13 @@ class TTSService {
    */
   async stop(): Promise<void> {
     try {
-      await Tts.stop();
+      if (this.usePiper && this.piperTTS) {
+        await this.piperTTS.stop();
+      } else {
+        await Tts.stop();
+      }
     } catch (error) {
-      console.error('Error stopping TTS:', error);
+      console.error('[TTSService] Error stopping TTS:', error);
     }
   }
 
@@ -94,55 +124,62 @@ class TTSService {
    */
   async isSpeaking(): Promise<boolean> {
     try {
-      return await Tts.isSpeaking();
+      if (this.usePiper && this.piperTTS) {
+        return this.piperTTS.isSpeaking();
+      } else {
+        return await Tts.isSpeaking();
+      }
     } catch (error) {
-      console.error('Error checking TTS status:', error);
       return false;
     }
   }
 
   /**
-   * Set speech rate (0.01 to 0.99)
+   * Set speech rate/speed
+   * For Piper: 1.0 = normal, < 1.0 = slower, > 1.0 = faster
    */
   async setRate(rate: number): Promise<void> {
-    try {
-      await Tts.setDefaultRate(Math.max(0.01, Math.min(0.99, rate)));
-    } catch (error) {
-      console.error('Error setting TTS rate:', error);
+    // Convert from react-native-tts rate (0.01-0.99) to Piper speed (0.5-2.0)
+    // Map 0.5 -> 0.5 (slow), 0.75 -> 1.0 (normal), 0.99 -> 2.0 (fast)
+    if (rate < 0.5) {
+      this.speechRate = 0.5;
+    } else if (rate < 0.75) {
+      // 0.5-0.75 maps to 0.5-1.0
+      this.speechRate = 0.5 + (rate - 0.5) * 2.0;
+    } else {
+      // 0.75-0.99 maps to 1.0-2.0
+      this.speechRate = 1.0 + ((rate - 0.75) / 0.24) * 1.0;
     }
+    console.log(`[TTSService] Set speech rate to ${this.speechRate}`);
   }
 
   /**
-   * Set pitch (0.5 to 2.0)
+   * Set pitch - Not supported by Piper, but kept for API compatibility
    */
-  async setPitch(pitch: number): Promise<void> {
-    try {
-      await Tts.setDefaultPitch(Math.max(0.5, Math.min(2.0, pitch)));
-    } catch (error) {
-      console.error('Error setting TTS pitch:', error);
-    }
+  async setPitch(_pitch: number): Promise<void> {
+    console.warn('[TTSService] Pitch adjustment not supported by Piper TTS');
   }
 
   /**
-   * Get available voices
+   * Get available voices - Returns Piper voice info
    */
   async getVoices(): Promise<any[]> {
-    try {
-      return await Tts.voices();
-    } catch (error) {
-      console.error('Error getting voices:', error);
-      return [];
-    }
+    return [
+      {
+        id: 'piper-randy-farmer',
+        name: 'Randy Farmer (Piper)',
+        language: 'en-US',
+        quality: 400, // Higher quality than system voices
+      },
+    ];
   }
 
   /**
-   * Set voice by ID
+   * Set voice by ID - Only one Piper voice available currently
    */
   async setVoice(voiceId: string): Promise<void> {
-    try {
-      await Tts.setDefaultVoice(voiceId);
-    } catch (error) {
-      console.error('Error setting voice:', error);
+    if (voiceId !== 'piper-randy-farmer') {
+      console.warn(`[TTSService] Voice ${voiceId} not available, using default Piper voice`);
     }
   }
 }
