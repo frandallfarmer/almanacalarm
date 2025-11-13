@@ -78,3 +78,17 @@ build.log
 
 # Voice training - ignore large training artifacts
 voice_training/*.onnx
+
+# Voice training artifacts
+voice_training/*.onnx
+voice_training/*.wav
+voice_training/full_crash_log.txt
+
+# Voice profile build artifacts
+voice_profiles/*.onnx
+voice_profiles/randy_farmer_*.onnx*
+
+# Keep only the active model
+!voice_profiles/voice-profile-randy-farmer.onnx
+!voice_profiles/voice-profile-randy-farmer.onnx.json
+!voice_profiles/voice-profile-randy-farmer-tokens.txt
